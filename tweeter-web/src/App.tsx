@@ -12,9 +12,14 @@ import Login from "./components/authentication/login/Login";
 import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
-import { AuthToken, User, FakeData, Status } from "tweeter-shared";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
+import { FolloweePresenter } from "./presenters/FolloweePresenter";
+import { UserItemView } from "./presenters/UserItemPresenter";
+import { FollowerPresenter } from "./presenters/FollowerPresenter";
+import { StatusItemView } from "./presenters/StatusItemPresenter";
+import { FeedPresenter } from "./presenters/FeedPresenter";
+import { StoryPresenter } from "./presenters/StoryPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
@@ -38,73 +43,26 @@ const App = () => {
 };
 
 const AuthenticatedRoutes = () => {
-  const loadMoreFollowers = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
-  };
-
-  const loadMoreFollowees = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
-  };
-
-  const loadMoreStoryItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
-  const loadMoreFeedItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
-  const generateFeedErrorMessage = () => {
-    return "Failed to load feed items because of exception";
-  }
-
-  const generateStoryErrorMessage = () => {
-    return "Failed to load story items because of exception";
-  }
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route index element={<Navigate to="/feed" />} />
-        <Route path="feed" element={<StatusItemScroller
-          defaultErrorMessage={generateFeedErrorMessage()}
-          loadMoreItems={loadMoreFeedItems}
+        <Route 
+        path="feed" 
+        element={<StatusItemScroller
+          generatePresenter={(view: StatusItemView) => new FeedPresenter(view)}
         />} />
-        <Route path="story" element={<StatusItemScroller
-          defaultErrorMessage={generateStoryErrorMessage()}
-          loadMoreItems={loadMoreStoryItems}
+        <Route 
+        path="story" 
+        element={<StatusItemScroller
+          generatePresenter={(view: StatusItemView) => new StoryPresenter(view)}
         />} />
         <Route
           path="followees"
           element={
             <UserItemScroller
               key={1}
-              loadItems={loadMoreFollowees}
-                itemDescription="followees"
+              presenterGenerator={(view: UserItemView) => new FolloweePresenter(view)}
             />
           }
         />
@@ -113,8 +71,7 @@ const AuthenticatedRoutes = () => {
           element={
             <UserItemScroller
               key={2} 
-              loadItems={loadMoreFollowers}
-                itemDescription="followers"
+              presenterGenerator={(view: UserItemView) => new FollowerPresenter(view)}
             />
           }
         />
