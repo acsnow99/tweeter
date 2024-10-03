@@ -39,6 +39,7 @@ const UserItemScroller = (props: Props) => {
   }, [newItems])
 
   const reset = async () => {
+    console.log("Resetting");
     setItems([]);
     setNewItems([]);
     setChangedDisplayedUser(true);
