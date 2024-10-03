@@ -5,7 +5,6 @@ import { UserInfoContext } from "../../userInfo/UserInfoProvider";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AliasPasswordFields from "../AliasPasswordFields";
 import { LoginPresenter, LoginView } from "../../../presenters/LoginPresenter";
