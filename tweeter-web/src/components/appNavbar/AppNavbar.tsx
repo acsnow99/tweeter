@@ -1,5 +1,5 @@
 import "./AppNavbar.css";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserInfoContext } from "../userInfo/UserInfoProvider";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
@@ -19,7 +19,7 @@ const AppNavbar = () => {
       clearUserInfo: clearUserInfo,
       displayErrorMessage: displayErrorMessage,
     }
-  const presenter = new NavBarPresenter(view);
+  const [presenter] = useState(new NavBarPresenter(view));
 
   return (
     <Navbar
