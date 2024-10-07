@@ -61,7 +61,7 @@ const Login = (props: Props) => {
       inputFieldGenerator={inputFieldGenerator}
       switchAuthenticationMethodGenerator={switchAuthenticationMethodGenerator}
       setRememberMe={setRememberMe}
-      submitButtonDisabled={checkSubmitButtonStatus}
+      submitButtonDisabled={checkSubmitButtonStatus()}
       isLoading={presenter.isLoading}
       submit={() => presenter.doLogin(alias, password, props.originalUrl, rememberMe)}
     />

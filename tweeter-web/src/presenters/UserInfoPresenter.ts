@@ -89,7 +89,7 @@ export class UserInfoPresenter {
       );
     } finally {
       this.view.clearLastInfoMessage();
-        this.isLoading = true;
+        this.isLoading = false;
     }
   };
 
