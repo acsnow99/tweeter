@@ -15,11 +15,11 @@ import Toaster from "./components/toaster/Toaster";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
 import { FolloweePresenter } from "./presenters/FolloweePresenter";
-import { UserItemView } from "./presenters/UserItemPresenter";
 import { FollowerPresenter } from "./presenters/FollowerPresenter";
-import { StatusItemView } from "./presenters/StatusItemPresenter";
 import { FeedPresenter } from "./presenters/FeedPresenter";
 import { StoryPresenter } from "./presenters/StoryPresenter";
+import { ItemView } from "./presenters/ItemPresenter";
+import { Status, User } from "tweeter-shared";
 
 const App = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
@@ -50,19 +50,19 @@ const AuthenticatedRoutes = () => {
         <Route 
         path="feed" 
         element={<StatusItemScroller
-          generatePresenter={(view: StatusItemView) => new FeedPresenter(view)}
+          generatePresenter={(view: ItemView<Status>) => new FeedPresenter(view)}
         />} />
         <Route 
         path="story" 
         element={<StatusItemScroller
-          generatePresenter={(view: StatusItemView) => new StoryPresenter(view)}
+          generatePresenter={(view: ItemView<Status>) => new StoryPresenter(view)}
         />} />
         <Route
           path="followees"
           element={
             <UserItemScroller
               key={1}
-              presenterGenerator={(view: UserItemView) => new FolloweePresenter(view)}
+              presenterGenerator={(view: ItemView<User>) => new FolloweePresenter(view)}
             />
           }
         />
@@ -71,7 +71,7 @@ const AuthenticatedRoutes = () => {
           element={
             <UserItemScroller
               key={2} 
-              presenterGenerator={(view: UserItemView) => new FollowerPresenter(view)}
+              presenterGenerator={(view: ItemView<User>) => new FollowerPresenter(view)}
             />
           }
         />
