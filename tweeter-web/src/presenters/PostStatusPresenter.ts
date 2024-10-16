@@ -1,17 +1,16 @@
 import { AuthToken, Status, User } from "tweeter-shared";
 import { StatusService } from "../model/service/StatusService";
 import useToastListener from "../components/toaster/ToastListenerHook";
-import { Presenter } from "./Presenter";
+import { Presenter, View } from "./Presenter";
+import { ProcessPresenter } from "./ProcessPresenter";
 
-export interface PostStatusView {
+export interface PostStatusView extends View {
     setPost: (post: string) => void,
     displayInfoMessage: (message: string, duration: number, bootstrapClasses?: string | undefined) => void
-    displayErrorMessage: (message: string) => void,
     clearLastInfoMessage: () => void,
 }
 
-export class PostStatusPresenter extends Presenter<PostStatusView> {
-    public isLoading = false;
+export class PostStatusPresenter extends ProcessPresenter<PostStatusView> {
     private statusService: StatusService;
     public post: string = "";
 
@@ -36,6 +35,7 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
         }, 
         "post the status",
         () => {
+            console.log("Done posting!")
             this.view.clearLastInfoMessage();
             this.isLoading = false;
         });
