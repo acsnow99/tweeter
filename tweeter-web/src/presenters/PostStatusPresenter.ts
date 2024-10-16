@@ -35,7 +35,6 @@ export class PostStatusPresenter extends ProcessPresenter<PostStatusView> {
         }, 
         "post the status",
         () => {
-            console.log("Done posting!")
             this.view.clearLastInfoMessage();
             this.isLoading = false;
         });

@@ -27,7 +27,7 @@ const PostStatus = (props: Props) => {
     displayErrorMessage: displayErrorMessage,
     clearLastInfoMessage: clearLastInfoMessage,
   }
-  const presenter = generatePresenter(view);
+  const [presenter] = useState(generatePresenter(view));
 
   return (
     <div className={presenter.isLoading ? "loading" : ""}>
