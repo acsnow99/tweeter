@@ -20,6 +20,10 @@ import { FeedPresenter } from "./presenters/FeedPresenter";
 import { StoryPresenter } from "./presenters/StoryPresenter";
 import { ItemView } from "./presenters/ItemPresenter";
 import { Status, User } from "tweeter-shared";
+import { ItemScroller } from "./components/mainLayout/ItemScroller";
+import StatusItem from "./components/statusItem/StatusItem";
+import UserItem from "./components/userItem/UserItem";
+import { UserService } from "./model/service/UserService";
 
 const App = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
@@ -49,29 +53,35 @@ const AuthenticatedRoutes = () => {
         <Route index element={<Navigate to="/feed" />} />
         <Route 
         path="feed" 
-        element={<StatusItemScroller
+        element={<ItemScroller
+          key={1}
+          generateItemComponent={(item) => <StatusItem status={item} />}
           generatePresenter={(view: ItemView<Status>) => new FeedPresenter(view)}
         />} />
         <Route 
         path="story" 
-        element={<StatusItemScroller
+        element={<ItemScroller
+          key={2}
+          generateItemComponent={(item) => <StatusItem status={item} />}
           generatePresenter={(view: ItemView<Status>) => new StoryPresenter(view)}
         />} />
         <Route
           path="followees"
           element={
-            <UserItemScroller
-              key={1}
-              presenterGenerator={(view: ItemView<User>) => new FolloweePresenter(view)}
+            <ItemScroller
+              key={3}
+              generateItemComponent={(item: User) => <UserItem value={item} />}
+              generatePresenter={(view: ItemView<User>) => new FolloweePresenter(view)}
             />
           }
         />
         <Route
           path="followers"
           element={
-            <UserItemScroller
-              key={2} 
-              presenterGenerator={(view: ItemView<User>) => new FollowerPresenter(view)}
+            <ItemScroller
+              key={4}
+              generateItemComponent={(item: User) => <UserItem value={item} />}
+              generatePresenter={(view: ItemView<User>) => new FollowerPresenter(view)}
             />
           }
         />

@@ -1,25 +1,23 @@
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import { UserInfoContext } from "../userInfo/UserInfoProvider";
-import { Status } from "tweeter-shared";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useToastListener from "../toaster/ToastListenerHook";
-import StatusItem from "../statusItem/StatusItem";
-import { StatusItemPresenter } from "../../presenters/StatusItemPresenter";
-import { ItemView } from "../../presenters/ItemPresenter";
+import { ItemPresenter, ItemView } from "../../presenters/ItemPresenter";
 
-interface Props {
-    generatePresenter: (view: ItemView<Status>) => StatusItemPresenter,
+interface Props<S, U extends ItemView<V>, V> {
+    generatePresenter: (view: ItemView<V>) => ItemPresenter<V, U, S>
+    generateItemComponent: (item: V) => ReactNode,
 }
 
-const StatusItemScroller = (props: Props) => {
-    const { generatePresenter } = props;
+export const ItemScroller = <S, U extends ItemView<V>, V,>(props: Props<S, U, V>) => {
+    const { generatePresenter, generateItemComponent } = props;
     const { displayErrorMessage } = useToastListener();
-    const [items, setItems] = useState<Status[]>([]);
-    const [newItems, setNewItems] = useState<Status[]>([]);
+    const [items, setItems] = useState<V[]>([]);
+    const [newItems, setNewItems] = useState<V[]>([]);
     const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
   
-    const { displayedUser, setDisplayedUser, currentUser, authToken } =
+    const { displayedUser, authToken } =
       useContext(UserInfoContext);
   
     // Initialize the component whenever the displayed user changes
@@ -55,8 +53,8 @@ const StatusItemScroller = (props: Props) => {
       setChangedDisplayedUser(false);
     };
 
-    const view: ItemView<Status> = {
-      addItems: (newItems: Status[]) =>
+    const view: ItemView<V> = {
+      addItems: (newItems: V[]) =>
         setNewItems(newItems),
       displayErrorMessage: displayErrorMessage,
     }
@@ -76,12 +74,10 @@ const StatusItemScroller = (props: Props) => {
                 key={index}
                 className="row mb-3 mx-0 px-0 border rounded bg-white"
               >
-                <StatusItem status={item} />
+                {generateItemComponent(item)}
               </div>
             ))}
           </InfiniteScroll>
         </div>
       );
 }
-
-export default StatusItemScroller;

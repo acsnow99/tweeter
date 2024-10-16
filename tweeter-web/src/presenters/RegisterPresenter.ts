@@ -1,5 +1,3 @@
-import { AuthToken, User } from "tweeter-shared";
-import { UserService } from "../model/service/UserService";
 import { ChangeEvent } from "react";
 import { Buffer } from "buffer";
 import { AuthPresenter, AuthView } from "./AuthPresenter";
