@@ -2,35 +2,29 @@ import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
 import { NavigateFunction } from "react-router-dom";
 import { Presenter, View } from "./Presenter";
+import { AuthPresenter, AuthView } from "./AuthPresenter";
 
-export interface LoginView extends View {
-    displayErrorMessage: (message: string) => void;
-    navigate: NavigateFunction;
-    updateUserInfo: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void;
+export interface LoginView extends AuthView {
 }
 
-export class LoginPresenter extends Presenter<LoginView> {
-    public isLoading = false;
-    private service: UserService;
-
+export class LoginPresenter extends AuthPresenter<LoginView> {
     public constructor(view: LoginView) {
         super(view);
-        this.service = new UserService();
     }
     
   public async doLogin(alias: string, password: string, originalUrl: string | undefined, rememberMe: boolean) {
     this.doFailureReportingOperation(async () => {
       this.isLoading = true;
 
-      const [user, authToken] = await this.service.login(alias, password);
-
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-
+      let path = "/"
       if (!!originalUrl) {
-        this.view.navigate(originalUrl);
-      } else {
-        this.view.navigate("/");
+        path = originalUrl;
       }
+
+      await this.updateUserNavigate(async () => {
+        const response = await this.service.login(alias, password);
+        return response;
+      }, rememberMe, path);
     }, 
     "log user in",
     () => {

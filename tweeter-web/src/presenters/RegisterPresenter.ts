@@ -2,11 +2,9 @@ import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
 import { ChangeEvent } from "react";
 import { Buffer } from "buffer";
-import { View } from "./Presenter";
+import { AuthPresenter, AuthView } from "./AuthPresenter";
 
-export interface RegisterView extends View {
-    updateUserInfo: (currentUser: User, displayedUser: User, authToken: AuthToken, rememberMe: boolean) => void,
-    navigate: (path: string) => void,
+export interface RegisterView extends AuthView {
     setImageBytes: (bytes: Uint8Array) => void,
 }
 
@@ -19,40 +17,34 @@ export interface RegisterProfile {
     imageFileExtension: string,
 }
 
-export class RegisterPresenter {
-    public isLoading = false;
-    private service: UserService;
-    private view: RegisterView;
+export class RegisterPresenter extends AuthPresenter<RegisterView> {
     public imageUrl: string = "";
     public imageFileExtension: string = "";
 
     public constructor(view: RegisterView) {
-        this.service = new UserService();
-        this.view = view;
+        super(view);
     }
 
     public async doRegister(userProfile: RegisterProfile, rememberMe: boolean) {
-        try {
+        this.doFailureReportingOperation(async () => {
           this.isLoading = true;
-    
-          const [user, authToken] = await this.service.register(
-            userProfile.firstName,
-            userProfile.lastName,
-            userProfile.alias,
-            userProfile.password,
-            userProfile.imageBytes,
-            userProfile.imageFileExtension,
-          );
-    
-          this.view.updateUserInfo(user, user, authToken, rememberMe);
-          this.view.navigate("/");
-        } catch (error) {
-          this.view.displayErrorMessage(
-            `Failed to register user because of exception: ${error}`
-          );
-        } finally {
-            this.isLoading = false;
-        }
+
+          await this.updateUserNavigate(async () => {
+            const response = await this.service.register(
+              userProfile.firstName,
+              userProfile.lastName,
+              userProfile.alias,
+              userProfile.password,
+              userProfile.imageBytes,
+              userProfile.imageFileExtension,
+            );
+            return response;
+          }, rememberMe, "/");
+        }, 
+        "register user",
+        () => {
+          this.isLoading = false;
+        });
       };
 
       public handleFileChange(event: ChangeEvent<HTMLInputElement>) {
