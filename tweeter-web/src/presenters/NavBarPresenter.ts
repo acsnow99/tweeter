@@ -9,17 +9,21 @@ export interface NavBarView extends View {
 }
 
 export class NavBarPresenter extends Presenter<NavBarView> {
-    private service: UserService;
+    private _service: UserService;
 
     public constructor(view: NavBarView) {
         super(view);
-        this.service = new UserService();
+        this._service = new UserService();
+    }
+
+    public get service() {
+      return this._service;
     }
     
   public async logOut(authToken: AuthToken) {
     this.view.displayInfoMessage("Logging Out...", 0);
 
-    this.doFailureReportingOperation(async () => {
+    await this.doFailureReportingOperation(async () => {
       await this.service.logout(authToken!);
 
       this.view.clearLastInfoMessage();
