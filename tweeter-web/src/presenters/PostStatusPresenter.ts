@@ -11,12 +11,16 @@ export interface PostStatusView extends View {
 }
 
 export class PostStatusPresenter extends ProcessPresenter<PostStatusView> {
-    private statusService: StatusService;
+    private _statusService: StatusService;
     public post: string = "";
 
     public constructor(view: PostStatusView) {
         super(view);
-        this.statusService = new StatusService();
+        this._statusService = new StatusService();
+    }
+
+    public get statusService() {
+        return this._statusService;
     }
 
     public async submitPost(event: React.MouseEvent, authToken: AuthToken, currentUser: User) {
