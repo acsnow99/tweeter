@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import { instance, mock, verify, when } from "ts-mockito";
+import { anything, instance, mock, verify, when } from "ts-mockito";
 import PostStatus from "../../../src/components/postStatus/PostStatus"
 import { PostStatusPresenter, PostStatusView } from "../../../src/presenters/PostStatusPresenter";
 import { AuthToken, User } from "tweeter-shared";
@@ -24,10 +24,12 @@ jest.mock("../../../src/components/userNavigation/UserHook", () => ({
 describe('PostStatus component', () => {
     const mockPostStatusPresenter = mock<PostStatusPresenter>();
     const mockPostStatusPresenterInstance = instance(mockPostStatusPresenter);
+    let mockUserInstance: User;
+    let mockAuthTokenInstance: AuthToken;
 
     beforeAll(() => {
-        const mockUserInstance = instance(mock<User>());
-        const mockAuthTokenInstance = instance(mock<AuthToken>());
+        mockUserInstance = instance(mock<User>());
+        mockAuthTokenInstance = instance(mock<AuthToken>());
         (useUserInfo as jest.Mock).mockReturnValue({
             currentUser: mockUserInstance,
             authToken: mockAuthTokenInstance,
@@ -68,6 +70,20 @@ describe('PostStatus component', () => {
 
         expect(postButton).toBeDisabled();
         expect(clearButton).toBeDisabled();
+    });
+
+    it ('submitPost method is called on presenter with correct parameters when Post Status pressed', async () => {
+        when(mockPostStatusPresenter.isLoading).thenReturn(false);
+
+        const {postButton, textField, user} = renderPostStatusAndGetElement(() => mockPostStatusPresenterInstance)
+
+        const post = "What a post!";
+        
+        await user.type(textField, post);
+
+        await user.click(postButton);
+
+        verify(mockPostStatusPresenter.submitPost(post, anything(), mockAuthTokenInstance, mockUserInstance));
     });
 });
 
