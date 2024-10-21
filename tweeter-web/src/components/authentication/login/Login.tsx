@@ -11,6 +11,7 @@ import { LoginPresenter, LoginView } from "../../../presenters/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
+  loginPresenter?: LoginPresenter;
 }
 
 const Login = (props: Props) => {
@@ -51,7 +52,7 @@ const Login = (props: Props) => {
     navigate: navigate,
     updateUserInfo: updateUserInfo,
   }
-  const [presenter] = useState(new LoginPresenter(view));
+  const [presenter] = useState(props.loginPresenter ?? new LoginPresenter(view));
 
   return (
     <AuthenticationFormLayout

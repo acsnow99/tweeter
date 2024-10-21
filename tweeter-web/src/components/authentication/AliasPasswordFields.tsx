@@ -16,6 +16,7 @@ const AliasPasswordFields = (props: Props) => {
                 className="form-control"
                 size={50}
                 id="aliasInput"
+                aria-label="alias"
                 placeholder="name@example.com"
                 onKeyDown={onEnter}
                 onChange={(event) => setAlias(event.target.value)}
@@ -27,6 +28,7 @@ const AliasPasswordFields = (props: Props) => {
                 type="password"
                 className="form-control"
                 id="passwordInput"
+                aria-label="password"
                 placeholder="Password"
                 onKeyDown={onEnter}
                 onChange={(event) => setPassword(event.target.value)}
