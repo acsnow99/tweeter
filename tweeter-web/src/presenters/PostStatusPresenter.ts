@@ -12,7 +12,6 @@ export interface PostStatusView extends View {
 
 export class PostStatusPresenter extends ProcessPresenter<PostStatusView> {
     private _statusService: StatusService;
-    public post: string = "";
 
     public constructor(view: PostStatusView) {
         super(view);
@@ -23,14 +22,14 @@ export class PostStatusPresenter extends ProcessPresenter<PostStatusView> {
         return this._statusService;
     }
 
-    public async submitPost(event: React.MouseEvent, authToken: AuthToken, currentUser: User) {
+    public async submitPost(post: string, event: React.MouseEvent, authToken: AuthToken, currentUser: User) {
         event.preventDefault();
 
-        this.doFailureReportingOperation(async () => {
+        await this.doFailureReportingOperation(async () => {
             this.isLoading = true;
             this.view.displayInfoMessage("Posting status...", 0);
         
-            const status = new Status(this.post, currentUser!, Date.now());
+            const status = new Status(post, currentUser!, Date.now());
         
             await this.statusService.postStatus(authToken!, status);
         

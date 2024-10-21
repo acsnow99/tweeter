@@ -27,7 +27,7 @@ describe('NavBarPresenter', () => {
         await navBarPresenter.logOut(authToken);
         verify(mockNavBarPresenterView.displayInfoMessage("Logging Out...", 0)).once();
     });
-
+    
     it("calls logout on the user service with the correct auth token", async () => {
         await navBarPresenter.logOut(authToken);
         verify(mockUserService.logout(authToken)).once();

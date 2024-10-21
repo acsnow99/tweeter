@@ -51,7 +51,7 @@ const PostStatus = (props: Props) => {
             type="button"
             disabled={checkButtonStatus()}
             style={{ width: "8em" }}
-            onClick={(event) => presenter.submitPost(event, authToken!, currentUser!)}
+            onClick={(event) => presenter.submitPost(post, event, authToken!, currentUser!)}
           >
             {presenter.isLoading ? (
               <span
