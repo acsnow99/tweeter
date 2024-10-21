@@ -35,7 +35,6 @@ describe('PostStatus component', () => {
     })
 
     it ('post status and clear buttons are both disabled on initial render', () => {
-        console.log('First test');
         when(mockPostStatusPresenter.isLoading).thenReturn(false);
 
         const {postButton, clearButton} = renderPostStatusAndGetElement(() => mockPostStatusPresenterInstance)
@@ -45,7 +44,6 @@ describe('PostStatus component', () => {
     });
 
     it ('post status and clear buttons are both enabled after text is typed', async () => {
-        console.log("second test");
         when(mockPostStatusPresenter.isLoading).thenReturn(false);
 
         const {postButton, clearButton, textField, user} = renderPostStatusAndGetElement(() => mockPostStatusPresenterInstance)
@@ -54,6 +52,22 @@ describe('PostStatus component', () => {
 
         expect(postButton).toBeEnabled();
         expect(clearButton).toBeEnabled();
+    });
+
+    it ('post status and clear buttons are both disabled after text is cleared', async () => {
+        when(mockPostStatusPresenter.isLoading).thenReturn(false);
+
+        const {postButton, clearButton, textField, user} = renderPostStatusAndGetElement(() => mockPostStatusPresenterInstance)
+
+        await user.type(textField, "What a post!");
+
+        expect(postButton).toBeEnabled();
+        expect(clearButton).toBeEnabled();
+
+        await user.clear(textField);
+
+        expect(postButton).toBeDisabled();
+        expect(clearButton).toBeDisabled();
     });
 });
 

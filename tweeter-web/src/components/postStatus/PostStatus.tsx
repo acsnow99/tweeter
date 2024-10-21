@@ -17,7 +17,6 @@ const PostStatus = (props: Props) => {
   const [post, setPost] = useState("");
  
   const checkButtonStatus = () => {
-    console.log("Checking button status:", !post.trim(), authToken, currentUser);
     return !post.trim() || !authToken || !currentUser;
   };
 
