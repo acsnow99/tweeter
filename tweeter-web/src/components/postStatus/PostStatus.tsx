@@ -1,9 +1,8 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { useContext } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoProvider";
 import useToastListener from "../toaster/ToastListenerHook";
 import { PostStatusPresenter, PostStatusView } from "../../presenters/PostStatusPresenter";
+import useUserInfo from "../userNavigation/UserHook";
 
 interface Props {
   generatePresenter: (view: PostStatusView) => PostStatusPresenter,
@@ -14,10 +13,11 @@ const PostStatus = (props: Props) => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
 
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const { currentUser, authToken } = useUserInfo();
   const [post, setPost] = useState("");
  
   const checkButtonStatus = () => {
+    console.log("Checking button status:", !post.trim(), authToken, currentUser);
     return !post.trim() || !authToken || !currentUser;
   };
 
