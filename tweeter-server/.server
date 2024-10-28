@@ -1,0 +1,6 @@
+BUCKET='cs340acsnow99'
+LAMBDA_ROLE='arn:aws:iam::558044283445:role/340-lambda'
+EDIT_LAMBDALIST='
+tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:2'
