@@ -11,10 +11,13 @@ export type { UserDto } from './model/dto/UserDto';
 // request types
 export type { PagedUserItemRequest } from './model/net/request/PagedUserItemRequest';
 export type { LoginRequest } from './model/net/request/LoginRequest';
+export type { LogoutRequest } from './model/net/request/LogoutRequest';
+export type { RegisterRequest } from './model/net/request/RegisterRequest';
 
 // response types
 export type { PagedUserItemResponse } from './model/net/response/PagedUserItemResponse';
 export type { LoginResponse } from './model/net/response/LoginResponse';
+export type { RegisterResponse } from './model/net/response/RegisterResponse';
 
 
 // All classes that should be avaialble to other modules need to exported here. export * does not work when 
