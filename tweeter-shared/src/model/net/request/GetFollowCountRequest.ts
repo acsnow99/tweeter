@@ -1,6 +1,6 @@
 import { UserDto } from "../../dto/UserDto";
 
-export interface GetFollowerCountRequest {
+export interface GetFollowCountRequest {
     readonly token: string;
     readonly user: UserDto;
 }

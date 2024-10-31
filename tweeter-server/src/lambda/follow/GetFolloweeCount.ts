@@ -8,7 +8,7 @@ export const handler = async (request: GetFollowCountRequest): Promise<GetFollow
         token,
         user
     } = request;
-    const count = await service.getFollowerCount(token, user);
+    const count = await service.getFolloweeCount(token, user);
     return {
         success: true,
         message: null,
