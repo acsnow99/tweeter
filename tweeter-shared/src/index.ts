@@ -13,6 +13,7 @@ export type { PagedUserItemRequest } from './model/net/request/PagedUserItemRequ
 export type { LoginRequest } from './model/net/request/LoginRequest';
 export type { LogoutRequest } from './model/net/request/LogoutRequest';
 export type { RegisterRequest } from './model/net/request/RegisterRequest';
+export type { GetIsFollowerStatusRequest } from './model/net/request/GetIsFollowerStatusRequest';
 
 // response types
 export type { PagedUserItemResponse } from './model/net/response/PagedUserItemResponse';
