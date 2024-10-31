@@ -2,5 +2,9 @@ BUCKET='cs340acsnow99'
 LAMBDA_ROLE='arn:aws:iam::558044283445:role/340-lambda'
 EDIT_LAMBDALIST='
 tweeterGetFollowers | dist/lambda/follow/GetFollowersLambda.handler
+tweeterGetFollowees | dist/lambda/follow/GetFolloweesLambda.handler
+tweeterLogin | dist/lambda/auth/Login.handler
+tweeterLogout | dist/lambda/auth/Logout.handler
+tweeterRegister | dist/lambda/auth/Register.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:2'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:4'
