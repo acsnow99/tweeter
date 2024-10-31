@@ -6,6 +6,8 @@ export const handler = async (request: RegisterRequest): Promise<RegisterRespons
     const [user, authToken] = await service.register(request.firstName, request.lastName, request.alias, request.password, request.userImageBytes, request.imageFileExtension);
 
     return {
+        success: true,
+        message: null,
         user,
         authToken,
     }

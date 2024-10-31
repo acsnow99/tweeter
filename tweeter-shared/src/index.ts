@@ -14,11 +14,14 @@ export type { LoginRequest } from './model/net/request/LoginRequest';
 export type { LogoutRequest } from './model/net/request/LogoutRequest';
 export type { RegisterRequest } from './model/net/request/RegisterRequest';
 export type { GetIsFollowerStatusRequest } from './model/net/request/GetIsFollowerStatusRequest';
+export type { GetFollowerCountRequest } from './model/net/request/GetFollowerCountRequest';
 
 // response types
 export type { PagedUserItemResponse } from './model/net/response/PagedUserItemResponse';
 export type { LoginResponse } from './model/net/response/LoginResponse';
 export type { RegisterResponse } from './model/net/response/RegisterResponse';
+export type { GetFollowerCountResponse } from './model/net/response/GetFollowerCountResponse';
+export type { GetIsFollowerStatusResponse } from './model/net/response/GetIsFollowerStatusResponse';
 
 
 // All classes that should be avaialble to other modules need to exported here. export * does not work when 
