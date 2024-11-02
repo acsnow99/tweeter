@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -53,6 +53,19 @@ export class ServerFacade {
 
     public async logout(request: LogoutRequest): Promise<void> {
         await this.makeSimpleRequestAndError(request, '/logout');
+    }
+
+    public async register(request: RegisterRequest): Promise<[User, AuthToken]> {
+        return await this.makeGetRequestAndError<RegisterRequest, RegisterResponse, User, [User, AuthToken]>(request, '/register', 
+            (response: RegisterResponse) => {
+                const userDto = response.user;
+                const user: User | null = userDto ? new User(userDto.firstName, userDto.lastName, userDto.alias, userDto.imageUrl) : null;
+                return user;
+            }, 
+            (response: RegisterResponse, items: User) => {
+                return [items, new AuthToken(response.authToken.token, response.authToken.timestamp)];
+            },
+        'Could not register user');
     }
 
     public async getUser(request: GetUserRequest): Promise<User> {
