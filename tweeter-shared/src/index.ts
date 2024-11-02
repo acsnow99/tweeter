@@ -12,6 +12,7 @@ export type { PostSegmentDto } from './model/dto/PostSegmentDto';
 export type { StatusDto } from './model/dto/StatusDto';
 
 // request types
+export type { TweeterRequest } from './model/net/request/TweeterRequest';
 export type { PagedUserItemRequest } from './model/net/request/PagedUserItemRequest';
 export type { LoginRequest } from './model/net/request/LoginRequest';
 export type { LogoutRequest } from './model/net/request/LogoutRequest';
@@ -24,8 +25,10 @@ export type { StatusRequest } from './model/net/request/StatusRequest';
 export type { PostStatusRequest } from './model/net/request/PostStatusRequest';
 
 // response types
+export type { TweeterResponse } from './model/net/response/TweeterResponse';
 export type { PagedUserItemResponse } from './model/net/response/PagedUserItemResponse';
 export type { LoginResponse } from './model/net/response/LoginResponse';
+export type { LogoutResponse } from './model/net/response/LogoutResponse';
 export type { RegisterResponse } from './model/net/response/RegisterResponse';
 export type { GetFollowCountResponse } from './model/net/response/GetFollowCountResponse';
 export type { GetIsFollowerStatusResponse } from './model/net/response/GetIsFollowerStatusResponse';

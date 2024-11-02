@@ -21,6 +21,7 @@ export class UserNavigationPresenter extends Presenter<UserNavigationView> {
           const alias = this.extractAlias(event.target.toString());
     
           const user = await this.service.getUser(authToken!, alias);
+          console.log("User from presenter layer", user);
     
           if (!!user) {
             if (currentUser!.equals(user)) {
