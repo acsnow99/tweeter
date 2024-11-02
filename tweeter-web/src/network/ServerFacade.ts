@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, PagedUserItemRequest, PagedUserItemResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, PagedUserItemRequest, PagedUserItemResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -25,6 +25,19 @@ export class ServerFacade {
             console.error(response);
             throw new Error(response.message ? response.message : undefined);
         }
+    }
+
+    public async login(request: LoginRequest): Promise<[User, AuthToken]> {
+        return await this.makeGetRequestAndError<LoginRequest, LoginResponse, User, [User, AuthToken]>(request, '/login', 
+            (response: LoginResponse) => {
+                const userDto = response.user;
+                const user: User | null = userDto ? new User(userDto.firstName, userDto.lastName, userDto.alias, userDto.imageUrl) : null;
+                return user;
+            }, 
+            (response: LoginResponse, items: User) => {
+                return [items, new AuthToken(response.token, 1)];
+            },
+        'Invalid alias or password');
     }
 
     public async getUser(request: GetUserRequest): Promise<User> {
