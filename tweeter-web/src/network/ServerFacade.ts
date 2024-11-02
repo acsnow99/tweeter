@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetFollowCountRequest, GetFollowCountResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -77,6 +77,28 @@ export class ServerFacade {
                 return items;
             },
         'Could not obtain follower status');
+    }
+
+    public async getFollowerCount(request: GetFollowCountRequest): Promise<number> {
+        return await this.makeGetRequestAndError<GetFollowCountRequest, GetFollowCountResponse, number, number>(request, '/follower-count', 
+            (response: GetFollowCountResponse) => {
+                return response.count;
+            }, 
+            (response: GetFollowCountResponse, items: number) => {
+                return items;
+            },
+        'Could not obtain number of followers');
+    }
+
+    public async getFolloweeCount(request: GetFollowCountRequest): Promise<number> {
+        return await this.makeGetRequestAndError<GetFollowCountRequest, GetFollowCountResponse, number, number>(request, '/followee-count', 
+            (response: GetFollowCountResponse) => {
+                return response.count;
+            }, 
+            (response: GetFollowCountResponse, items: number) => {
+                return items;
+            },
+        'Could not obtain number of followees');
     }
 
     public async getUser(request: GetUserRequest): Promise<User> {
