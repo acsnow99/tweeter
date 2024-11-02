@@ -28,6 +28,7 @@ export type { PagedUserItemResponse } from './model/net/response/PagedUserItemRe
 export type { LoginResponse } from './model/net/response/LoginResponse';
 export type { RegisterResponse } from './model/net/response/RegisterResponse';
 export type { GetFollowCountResponse } from './model/net/response/GetFollowCountResponse';
+export type { GetIsFollowerStatusResponse } from './model/net/response/GetIsFollowerStatusResponse';
 export type { GetUserResponse } from './model/net/response/GetUserResponse';
 export type { FollowResponse } from './model/net/response/FollowResponse';
 export type { StatusResponse } from './model/net/response/StatusResponse';
