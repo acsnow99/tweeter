@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FakeData, GetUserRequest, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FakeData, GetUserRequest, PagedUserItemRequest, User } from "tweeter-shared";
 import { Buffer } from "buffer";
 import { ServerFacade } from "../../network/ServerFacade";
 
@@ -93,8 +93,18 @@ export class UserService {
     pageSize: number,
     lastItem: User | null
   ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+    const request: PagedUserItemRequest = {
+      token: authToken.token,
+      userAlias,
+      pageSize,
+      lastItem: lastItem ? { 
+        firstName: lastItem.firstName,
+        lastName: lastItem.lastName,
+        alias: lastItem.alias,
+        imageUrl: lastItem.imageUrl
+      } : null
+    }
+    return await this.serverFacade.loadMoreFollowers(request);
   };
 
   public async loadMoreFollowees(
@@ -103,8 +113,18 @@ export class UserService {
     pageSize: number,
     lastItem: User | null
   ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+    const request: PagedUserItemRequest = {
+      token: authToken.token,
+      userAlias,
+      pageSize,
+      lastItem: lastItem ? { 
+        firstName: lastItem.firstName,
+        lastName: lastItem.lastName,
+        alias: lastItem.alias,
+        imageUrl: lastItem.imageUrl
+      } : null
+    }
+    return await this.serverFacade.loadMoreFollowees(request);
   };
 
   public async follow(

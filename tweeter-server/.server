@@ -16,4 +16,4 @@ tweeterLoadMoreFeedItems | dist/lambda/status/LoadMoreFeedItems.handler
 tweeterLoadMoreStoryItems | dist/lambda/status/LoadMoreStoryItems.handler
 tweeterPostStatus | dist/lambda/status/PostStatusLambda.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:6'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:7'
