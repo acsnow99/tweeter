@@ -73,6 +73,16 @@ export class ServerFacade {
         },
         'Invalid response from server');
     }
+
+    public async unfollow(request: FollowRequest): Promise<[number, number]> {
+        return await this.makeGetRequestAndError<FollowRequest, FollowResponse, [number, number], [number, number]>(request, '/unfollow', (response: FollowResponse) => {
+            return [response.followerCount, response.followeeCount]
+        },
+        (response: FollowResponse, items: [number, number]) => {
+            return items;
+        },
+        'Invalid response from server');
+    }
 }
 
 // const authTokenDto: AuthTokenDto = {
