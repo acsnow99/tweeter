@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, GetUserRequest, GetUserResponse, PagedUserItemRequest, PagedUserItemResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, PagedUserItemRequest, PagedUserItemResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -9,74 +9,69 @@ export class ServerFacade {
         this.communicator = new ClientCommunicator(this.SERVER_URL);
     }
 
-    public async getUser(request: GetUserRequest): Promise<User> {
+    private async makeGetRequestAndError<T extends TweeterRequest, U extends TweeterResponse, V, X>(request: T, endpoint: string, getItems: (response: U) => V | null, getReturnItems: (response: U, items: V) => X, errorMessage: string) {
         const response = await this.communicator.doPost<
-            GetUserRequest, 
-            GetUserResponse
-        >(request, '/user');
-
-        const userDto = response.user;
-        console.log("UserDto from facade", userDto, userDto?.firstName, userDto?.alias);
-        const user: User | null = userDto ? new User(userDto.firstName, userDto.lastName, userDto.alias, userDto.imageUrl) : null;
-        console.log("User from facade", user);
-
+            T, 
+            U
+        >(request, endpoint);
+        const items: V | null = getItems(response);
         if (response.success) {
-            if (user === null) {
-                throw new Error('No user found');
+            if (items === null) {
+                throw new Error(errorMessage);
             } else {
-                return user;
+                return getReturnItems(response, items);
             }
         } else {
             console.error(response);
             throw new Error(response.message ? response.message : undefined);
         }
+    }
+
+    public async getUser(request: GetUserRequest): Promise<User> {
+        return await this.makeGetRequestAndError<GetUserRequest, GetUserResponse, User, User>(request, '/user', 
+            (response: GetUserResponse) => {
+                const userDto = response.user;
+                const user: User | null = userDto ? new User(userDto.firstName, userDto.lastName, userDto.alias, userDto.imageUrl) : null;
+                return user;
+            }, 
+            (response: GetUserResponse, items: User) => {
+                return items;
+            },
+        'No user found');
     }
 
     public async loadMoreFollowers(request: PagedUserItemRequest): Promise<[User[], boolean]> {
-        const response = await this.communicator.doPost<
-            PagedUserItemRequest, 
-            PagedUserItemResponse>
-        (request, '/followers');
-        
-        const items: User[] | null =
-        response.success && response.items
-            ? response.items.map((dto) => User.fromDto(dto) as User)
-            : null;
-
-        if (response.success) {
-            if (items == null) {
-                throw new Error(`No followers found`);
-            } else {
-                return [items, response.hasMore];
-            }
-        } else {
-            console.error(response);
-            throw new Error(response.message ? response.message : undefined);
-        }
+        return await this.makeGetRequestAndError<PagedUserItemRequest, PagedUserItemResponse, User[], [User[], boolean]>(request, '/followers', (response: PagedUserItemResponse) => {
+            return response.success && response.items
+                    ? response.items.map((dto) => User.fromDto(dto) as User)
+                    : null;
+        },
+        (response: PagedUserItemResponse, items: User[]) => {
+            return [items, response.hasMore];
+        },
+        'No followers found');
     }
 
     public async loadMoreFollowees(request: PagedUserItemRequest): Promise<[User[], boolean]> {
-        const response = await this.communicator.doPost<
-            PagedUserItemRequest, 
-            PagedUserItemResponse>
-        (request, '/followees');
-        console.log("Called followees");
-        
-        const items: User[] | null =
-        response.success && response.items
-            ? response.items.map((dto) => User.fromDto(dto) as User)
-            : null;
+        return await this.makeGetRequestAndError<PagedUserItemRequest, PagedUserItemResponse, User[], [User[], boolean]>(request, '/followees', (response: PagedUserItemResponse) => {
+            return response.success && response.items
+                    ? response.items.map((dto) => User.fromDto(dto) as User)
+                    : null;
+        },
+        (response: PagedUserItemResponse, items: User[]) => {
+            return [items, response.hasMore];
+        },
+        'No followees found');
+    }
 
-        if (response.success) {
-            if (items == null) {
-                throw new Error(`No followees found`);
-            } else {
-                return [items, response.hasMore];
-            }
-        } else {
-            console.error(response);
-            throw new Error(response.message ? response.message : undefined);
-        }
+    public async follow(request: FollowRequest): Promise<[number, number]> {
+        return await this.makeGetRequestAndError<FollowRequest, FollowResponse, [number, number], [number, number]>(request, '/follow', (response: FollowResponse) => {
+            return [response.followerCount, response.followeeCount]
+        },
+        (response: FollowResponse, items: [number, number]) => {
+            return items;
+        },
+        'Invalid response from server');
     }
 }
 
