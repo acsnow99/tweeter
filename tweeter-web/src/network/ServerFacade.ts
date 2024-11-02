@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetFollowCountRequest, GetFollowCountResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, Status, StatusRequest, StatusResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, FollowRequest, FollowResponse, GetFollowCountRequest, GetFollowCountResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, PostStatusRequest, RegisterRequest, RegisterResponse, Status, StatusRequest, StatusResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -181,5 +181,9 @@ export class ServerFacade {
             return [items, response.hasMore];
         },
         'No feed items found');
+    }
+
+    public async postStatus(request: PostStatusRequest): Promise<void> {
+        await this.makeSimpleRequestAndError(request, '/post');
     }
 }

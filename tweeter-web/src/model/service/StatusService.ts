@@ -1,4 +1,4 @@
-import { AuthToken, FakeData, PostSegmentDto, Status, StatusRequest } from "tweeter-shared";
+import { AuthToken, FakeData, PostSegmentDto, PostStatusRequest, Status, StatusRequest } from "tweeter-shared";
 import { ServerFacade } from "../../network/ServerFacade";
 
 export class StatusService {
@@ -28,17 +28,29 @@ export class StatusService {
         pageSize: number,
         lastItem: Status | null
     ): Promise<[Status[], boolean]> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+        const request: StatusRequest = {
+            authToken: {
+                token: authToken.token,
+                timestamp: authToken.timestamp
+            },
+            userAlias,
+            pageSize,
+            lastItem: lastItem ? lastItem.dto : null
+        };
+        return await this.serverFacade.loadMoreFeedItems(request);
     };
 
     public async postStatus(
         authToken: AuthToken,
         newStatus: Status
     ): Promise<void> {
-        // Pause so we can see the logging out message. Remove when connected to the server
-        await new Promise((f) => setTimeout(f, 2000));
-
-        // TODO: Call the server to post the status
+        const request: PostStatusRequest = {
+            authToken: {
+                token: authToken.token,
+                timestamp: authToken.timestamp
+            },
+            newStatus: newStatus.dto
+        };
+        await this.serverFacade.postStatus(request);
     };
 }
