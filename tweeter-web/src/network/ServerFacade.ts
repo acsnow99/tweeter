@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetFollowCountRequest, GetFollowCountResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetFollowCountRequest, GetFollowCountResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, Status, StatusRequest, StatusResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -157,13 +157,29 @@ export class ServerFacade {
         },
         'Invalid response from server');
     }
-}
 
-// const authTokenDto: AuthTokenDto = {
-//     token: authToken.token,
-//     timestamp: authToken.timestamp
-// }
-// const request: GetUserRequest = {
-//     authToken: authTokenDto,
-//     alias
-// }
+
+    public async loadMoreStoryItems(request: StatusRequest): Promise<[Status[], boolean]> {
+        return await this.makeGetRequestAndError<StatusRequest, StatusResponse, Status[], [Status[], boolean]>(request, '/story-items', (response: StatusResponse) => {
+            return response.success && response.items
+                    ? response.items.map((dto) => Status.fromDto(dto) as Status)
+                    : null;
+        },
+        (response: StatusResponse, items: Status[]) => {
+            return [items, response.hasMore];
+        },
+        'No story items found');
+    }
+
+    public async loadMoreFeedItems(request: StatusRequest): Promise<[Status[], boolean]> {
+        return await this.makeGetRequestAndError<StatusRequest, StatusResponse, Status[], [Status[], boolean]>(request, '/feed-items', (response: StatusResponse) => {
+            return response.success && response.items
+                    ? response.items.map((dto) => Status.fromDto(dto) as Status)
+                    : null;
+        },
+        (response: StatusResponse, items: Status[]) => {
+            return [items, response.hasMore];
+        },
+        'No feed items found');
+    }
+}

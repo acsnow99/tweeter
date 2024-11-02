@@ -276,8 +276,17 @@ export class Status {
     return JSON.stringify(this);
   }
 
+  public get dto() {
+    return { 
+      post: this.post, 
+      user: this.user.dto, 
+      timestamp: this.timestamp,
+      segments: this.segments
+    };
+  }
+
   public static fromDto(status: StatusDto | null): Status | null {
-    return status ? new Status(
+    return (status && status.user) ? new Status(
       status.post, 
       new User(status.user.firstName, status.user.lastName, status.user.alias, status.user.imageUrl),
       status.timestamp) 

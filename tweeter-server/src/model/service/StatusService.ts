@@ -9,7 +9,8 @@ export class StatusService {
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
         // TODO: Replace with the result of calling server
-        return FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        return [statuses.map((status) => status.dto), hasMore]
     };
     
     public async loadMoreFeedItems(
@@ -19,7 +20,8 @@ export class StatusService {
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
         // TODO: Replace with the result of calling server
-        return FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
+        return [statuses.map((status) => status.dto), hasMore]
     };
 
     public async postStatus(

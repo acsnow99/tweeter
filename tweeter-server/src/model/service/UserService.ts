@@ -15,7 +15,7 @@ export class UserService {
       throw new Error("Invalid alias or password");
     }
 
-    return [user, FakeData.instance.authToken.token];
+    return [user.dto, FakeData.instance.authToken.token];
   };
 
   public async logout(authToken: AuthTokenDto): Promise<void> {
@@ -30,7 +30,7 @@ export class UserService {
     password: string,
     userImageBytes: Uint8Array,
     imageFileExtension: string
-  ): Promise<[User, AuthToken]> {
+  ): Promise<[UserDto, AuthToken]> {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
     const imageStringBase64: string =
       Buffer.from(userImageBytes).toString("base64");
@@ -42,7 +42,7 @@ export class UserService {
       throw new Error("Invalid registration");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken];
   };
 
   public async getIsFollowerStatus(
