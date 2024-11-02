@@ -1,4 +1,4 @@
-import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, FollowRequest, FollowResponse, GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, PagedUserItemRequest, PagedUserItemResponse, RegisterRequest, RegisterResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -66,6 +66,17 @@ export class ServerFacade {
                 return [items, new AuthToken(response.authToken.token, response.authToken.timestamp)];
             },
         'Could not register user');
+    }
+
+    public async getIsFollowerStatus(request: GetIsFollowerStatusRequest): Promise<boolean> {
+        return await this.makeGetRequestAndError<GetIsFollowerStatusRequest, GetIsFollowerStatusResponse, boolean, boolean>(request, '/is-follower', 
+            (response: GetIsFollowerStatusResponse) => {
+                return response.status;
+            }, 
+            (response: GetIsFollowerStatusResponse, items: boolean) => {
+                return items;
+            },
+        'Could not obtain follower status');
     }
 
     public async getUser(request: GetUserRequest): Promise<User> {
