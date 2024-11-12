@@ -8,11 +8,17 @@ export class UserService {
     alias: string,
     password: string
   ): Promise<[UserDto, string]> {
+    if (alias === '') {
+      throw new Error("[Bad Request] Invalid alias");
+    }
+    if (password === '') {
+      throw new Error("[Bad Request] Invalid password");
+    }
     // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
     if (user === null) {
-      throw new Error("Invalid alias or password");
+      throw new Error("[Bad Request] Invalid alias or password");
     }
 
     return [user.dto, FakeData.instance.authToken.token];
