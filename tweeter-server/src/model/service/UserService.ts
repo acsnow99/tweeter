@@ -55,7 +55,7 @@ export class UserService {
 
     const aliasValidate = this.authDao.createUserPassword(alias, password);
     const authTokenResult = this.authDao.createSession(alias, password);
-    const userResult = this.userDao.createUser(user);
+    const userResult = await this.userDao.createUser(user);
     if (aliasValidate === null || authTokenResult === null || userResult === null) {
       throw new Error("Invalid registration");
     }
