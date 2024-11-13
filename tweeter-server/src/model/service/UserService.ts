@@ -19,6 +19,12 @@ export class UserService {
     alias: string,
     password: string
   ): Promise<[UserDto, string]> {
+    if (alias === '') {
+      throw new Error("[Bad Request] Invalid alias");
+    }
+    if (password === '') {
+      throw new Error("[Bad Request] Invalid password");
+    }
     const authTokenResult = this.authDao.createSession(alias, password);
     const userResult = this.userDao.getUser(alias);
     if (userResult === null || authTokenResult === null) {
