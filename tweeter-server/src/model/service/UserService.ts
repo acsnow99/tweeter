@@ -2,20 +2,29 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import { Buffer } from "buffer";
 import { UserDto } from "tweeter-shared/src";
 import { AuthTokenDto } from "tweeter-shared/src/model/dto/AuthTokenDto";
+import { DaoFactory } from "../dao/DaoFactory";
+import { UserDao } from "../dao/UserDao";
+import { AuthDao } from "../dao/AuthDao";
 
 export class UserService {
+  private userDao: UserDao;
+  private authDao: AuthDao;
+
+  constructor() {
+    this.userDao = new DaoFactory().getUserDao();
+    this.authDao = new DaoFactory().getAuthDao();
+  }
+
   public async login(
     alias: string,
     password: string
   ): Promise<[UserDto, string]> {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
+    const authTokenResult = this.authDao.createSession(alias, password);
+    const userResult = this.userDao.getUser(alias);
+    if (userResult === null || authTokenResult === null) {
       throw new Error("Invalid alias or password");
     }
-
-    return [user.dto, FakeData.instance.authToken.token];
+    return [userResult, authTokenResult.token];
   };
 
   public async logout(authToken: AuthTokenDto): Promise<void> {
@@ -30,19 +39,21 @@ export class UserService {
     password: string,
     userImageBytes: Uint8Array,
     imageFileExtension: string
-  ): Promise<[UserDto, AuthToken]> {
+  ): Promise<[UserDto, AuthTokenDto]> {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
     const imageStringBase64: string =
       Buffer.from(userImageBytes).toString("base64");
+  
+    // TO-DO: Replace google.com with actual S3 URL
+    const user = new User(firstName, lastName, alias, "google.com").dto;
 
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
+    const aliasValidate = this.authDao.createUserPassword(alias, password);
+    const authTokenResult = this.authDao.createSession(alias, password);
+    const userResult = this.userDao.createUser(user);
+    if (aliasValidate === null || authTokenResult === null || userResult === null) {
       throw new Error("Invalid registration");
     }
-
-    return [user.dto, FakeData.instance.authToken];
+    return [userResult, authTokenResult];
   };
 
   public async getIsFollowerStatus(
