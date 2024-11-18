@@ -7,12 +7,14 @@ import { UserDao } from "../dao/UserDao";
 import { AuthDao } from "../dao/AuthDao";
 
 export class UserService {
+  private daoFactory: DaoFactory;
   private userDao: UserDao;
   private authDao: AuthDao;
 
-  constructor() {
-    this.userDao = new DaoFactory().getUserDao();
-    this.authDao = new DaoFactory().getAuthDao();
+  constructor(daoFactory: DaoFactory) {
+    this.daoFactory = daoFactory;
+    this.userDao = daoFactory.getUserDao();
+    this.authDao = daoFactory.getAuthDao();
   }
 
   public async login(

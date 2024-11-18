@@ -1,8 +1,8 @@
-import { UserService } from '../../model/service/UserService';
 import { RegisterRequest, RegisterResponse } from 'tweeter-shared'
+import { getUserService } from '../utils';
 
 export const handler = async (request: RegisterRequest): Promise<RegisterResponse> => {
-    const service = new UserService();
+    const service = getUserService();
     const [user, authToken] = await service.register(request.firstName, request.lastName, request.alias, request.password, request.userImageBytes, request.imageFileExtension);
 
     return {

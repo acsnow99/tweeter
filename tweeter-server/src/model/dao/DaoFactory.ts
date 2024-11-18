@@ -1,12 +1,7 @@
-import { AuthDaoDynamo } from "./AuthDaoDynamo";
-import { UserDaoDynamo } from "./UserDaoDynamo";
+import { AuthDao } from "./AuthDao";
+import { UserDao } from "./UserDao";
 
-export class DaoFactory {
-    public getUserDao() {
-        return new UserDaoDynamo();
-    }
-
-    public getAuthDao() {
-        return new AuthDaoDynamo();
-    }
+export interface DaoFactory {
+    readonly getUserDao: () => UserDao;
+    readonly getAuthDao: () => AuthDao;
 }

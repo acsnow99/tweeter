@@ -4,7 +4,7 @@ import { AuthTokenDto } from "tweeter-shared/src";
 
 export class AuthDaoDynamo implements AuthDao {
     public createUserPassword(alias: string, password: string) {
-        return alias
+        return alias;
     }
 
     public createSession(alias: string, password: string) {
