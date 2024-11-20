@@ -25,15 +25,12 @@ export class UserDaoDynamo implements UserDao {
         Key: {
           alias: alias,
         },
-        // Set this to make sure that recent writes are reflected.
-        // For more information, see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html.
-        ConsistentRead: true,
       });
       const getResponse = await this.client.send(getCommand);
-      if (!getResponse.Item || !getResponse.Item.firstName || !getResponse.Item.lastName || !getResponse.Item.alias) {
+      if (!getResponse.Item || !getResponse.Item[this.firstNameAttr] || !getResponse.Item[this.lastNameAttr] || !getResponse.Item[this.aliasAttr]) {
         return null;
       }
-      const user = new User(getResponse.Item.firstName, getResponse.Item.lastName, getResponse.Item.alias, getResponse.Item.imageUrl).dto;
+      const user = new User(getResponse.Item[this.firstNameAttr], getResponse.Item[this.lastNameAttr], getResponse.Item[this.aliasAttr], getResponse.Item[this.imageUrlAttr]).dto;
       return user;
     }
 

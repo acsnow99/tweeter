@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm run compile",
     "compile": "npm run clean && npx tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "npm run build && node dist/Main.js"
   },
   "author": "",
   "license": "ISC",

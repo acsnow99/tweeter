@@ -94,14 +94,8 @@ export class UserService {
     authToken: AuthTokenDto,
     alias: string
   ): Promise<UserDto | null> {
-    // TODO: Replace with the result of calling server
-    const user: User | null = FakeData.instance.findUserByAlias(alias);
-    return user === null ? null : {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      alias: user.alias,
-      imageUrl: user.imageUrl
-    }
+    const user: UserDto | null = await this.userDao.getUser(alias);
+    return user;
   };
 
   public async loadMoreFollowers(
