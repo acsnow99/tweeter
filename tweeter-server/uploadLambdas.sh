@@ -5,6 +5,14 @@ set -e
 
 source .server
 
+if [ -f "dist.zip" ]; then
+  rm dist.zip
+fi
+
+npm run build
+
+zip -r dist.zip ./dist
+
 aws s3 cp dist.zip s3://$BUCKET/code/lambdalist.zip
 
 # using -e let's us use escape characters such as \n if the output is in quotation marks
