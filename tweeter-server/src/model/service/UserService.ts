@@ -27,7 +27,7 @@ export class UserService {
     if (password === '') {
       throw new Error("[Bad Request] Invalid password");
     }
-    const authTokenResult = this.authDao.createSession(alias, password);
+    const authTokenResult = await this.authDao.createSession(alias, password);
     const userResult = await this.userDao.getUser(alias);
     if (userResult === null || authTokenResult === null) {
       throw new Error("Invalid alias or password");
@@ -51,13 +51,20 @@ export class UserService {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
     const imageStringBase64: string =
       Buffer.from(userImageBytes).toString("base64");
+
+    // check for existing user with the alias
+    const existingUser = await this.userDao.getUser(alias);
+    if (existingUser !== null) {
+      throw new Error("Invalid registration: alias already taken");
+    }
   
     // TO-DO: Replace google.com with actual S3 URL
     const user = new User(firstName, lastName, alias, "google.com").dto;
 
-    const aliasValidate = this.authDao.createUserPassword(alias, password);
-    const authTokenResult = this.authDao.createSession(alias, password);
+    const aliasValidate = await this.authDao.createUserPassword(alias, password);
+    const authTokenResult = await this.authDao.createSession(alias, password);
     const userResult = await this.userDao.createUser(user);
+    console.log("Results from create user", aliasValidate, authTokenResult, userResult);
     if (aliasValidate === null || authTokenResult === null || userResult === null) {
       throw new Error("Invalid registration");
     }

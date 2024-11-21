@@ -36,7 +36,7 @@ export class UserDaoDynamo implements UserDao {
 
     public async createUser(user: UserDto) {
       const existingUser = await this.getUser(user.alias);
-      if (existingUser === null) {
+      if (existingUser !== null) {
         return null;
       }
       const params = {
