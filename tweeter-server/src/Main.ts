@@ -52,4 +52,4 @@ const loginTest = async () => {
   console.log(await loginHandler(loginRequest));
 }
 
-getUserTest();
+registerTest();

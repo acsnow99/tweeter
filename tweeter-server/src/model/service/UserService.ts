@@ -5,16 +5,19 @@ import { AuthTokenDto } from "tweeter-shared/src/model/dto/AuthTokenDto";
 import { DaoFactory } from "../dao/DaoFactory";
 import { UserDao } from "../dao/UserDao";
 import { AuthDao } from "../dao/AuthDao";
+import { ImageDao } from "../dao/ImageDao";
 
 export class UserService {
   private daoFactory: DaoFactory;
   private userDao: UserDao;
   private authDao: AuthDao;
+  private imageDao: ImageDao;
 
   constructor(daoFactory: DaoFactory) {
     this.daoFactory = daoFactory;
     this.userDao = daoFactory.getUserDao();
     this.authDao = daoFactory.getAuthDao();
+    this.imageDao = daoFactory.getImageDao();
   }
 
   public async login(
@@ -57,9 +60,10 @@ export class UserService {
     if (existingUser !== null) {
       throw new Error("Invalid registration: alias already taken");
     }
+
+    const imageUrl = await this.imageDao.putImage(alias, imageStringBase64);
   
-    // TO-DO: Replace google.com with actual S3 URL
-    const user = new User(firstName, lastName, alias, "google.com").dto;
+    const user = new User(firstName, lastName, alias, imageUrl).dto;
 
     const aliasValidate = await this.authDao.createUserPassword(alias, password);
     const authTokenResult = await this.authDao.createSession(alias, password);
