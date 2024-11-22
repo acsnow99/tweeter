@@ -1,5 +1,6 @@
 import { ImageDao } from "./ImageDao";
-import { S3Client, PutObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, ObjectCannedACL, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
 
 export class ImageDaoS3 implements ImageDao {
     private readonly bucket = "cs340tweeter-images";
@@ -33,6 +34,24 @@ export class ImageDaoS3 implements ImageDao {
     }
 
     public async getImage(fileName: string) {
-        return "Not an image";
+        const client = new S3Client({ region: this.region });
+        const params = {
+            Bucket: this.bucket,
+            Key: "image/" + fileName
+        }
+        const command = new GetObjectCommand(params);
+        const response = await client.send(command);
+
+        // The `Body` in the response is a readable stream
+        const streamToString = (stream: Readable) =>
+            new Promise<string>((resolve, reject) => {
+                const chunks: Buffer[] = [];
+                stream.on('data', (chunk) => chunks.push(chunk));
+                stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+                stream.on('error', reject);
+            });
+
+        const data: string = "";
+        return data;
     }
 }
