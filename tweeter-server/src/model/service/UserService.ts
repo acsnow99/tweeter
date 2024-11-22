@@ -30,7 +30,7 @@ export class UserService {
     const authTokenResult = await this.authDao.createSession(alias, password);
     const userResult = await this.userDao.getUser(alias);
     if (userResult === null || authTokenResult === null) {
-      throw new Error("Invalid alias or password");
+      throw new Error("[Unauthorized] Invalid alias or password");
     }
     return [userResult, authTokenResult.token];
   };
@@ -64,9 +64,8 @@ export class UserService {
     const aliasValidate = await this.authDao.createUserPassword(alias, password);
     const authTokenResult = await this.authDao.createSession(alias, password);
     const userResult = await this.userDao.createUser(user);
-    console.log("Results from create user", aliasValidate, authTokenResult, userResult);
     if (aliasValidate === null || authTokenResult === null || userResult === null) {
-      throw new Error("Invalid registration");
+      throw new Error("[Bad Request] Invalid registration");
     }
     return [userResult, authTokenResult];
   };
