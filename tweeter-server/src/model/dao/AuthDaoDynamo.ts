@@ -3,6 +3,7 @@ import { AuthDao } from "./AuthDao";
 import { AuthTokenDto } from "tweeter-shared/src";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { genSalt, hash } from "bcryptjs";
 
 export class AuthDaoDynamo implements AuthDao {
     private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
@@ -11,11 +12,13 @@ export class AuthDaoDynamo implements AuthDao {
     private readonly passwordAttr = "password";
 
     public async createUserPassword(alias: string, password: string) {
+        const salt = await genSalt();
+        const hashedPassword = await hash(password, salt);
         const params = {
             TableName: this.tableName,
             Item: {
               [this.aliasAttr]: alias,
-              [this.passwordAttr]: password,
+              [this.passwordAttr]: hashedPassword,
             },
           };
         await this.client.send(new PutCommand(params));
