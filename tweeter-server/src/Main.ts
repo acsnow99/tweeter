@@ -1,7 +1,8 @@
-import { GetUserRequest } from "tweeter-shared";
+import { GetUserRequest, LoginRequest } from "tweeter-shared";
 import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
 import { RegisterRequest } from "tweeter-shared";
+import { handler as loginHandler } from "./lambda/auth/Login";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -38,4 +39,12 @@ const registerTest = async () => {
     console.log(await registerHandler(registerRequest));
 }
 
-registerTest();
+const loginTest = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  console.log(await loginHandler(loginRequest));
+}
+
+loginTest();
