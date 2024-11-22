@@ -17,12 +17,17 @@ function generateRandomString(length: number): string {
   }
 
 const getUserTest = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
     const getUserRequest: GetUserRequest = {
         authToken: {
-          token: "abcdefg",
-          timestamp: 1234
+          token: loginResponse.token,
+          timestamp: Date.now()
         },
-        alias: "Me"
+        alias: "eLNen2ZVrK"
       }
     console.log(await getUserHandler(getUserRequest));
 }
@@ -47,4 +52,4 @@ const loginTest = async () => {
   console.log(await loginHandler(loginRequest));
 }
 
-loginTest();
+getUserTest();

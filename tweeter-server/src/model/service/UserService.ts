@@ -100,6 +100,10 @@ export class UserService {
     authToken: AuthTokenDto,
     alias: string
   ): Promise<UserDto | null> {
+    const isValidToken = await this.authDao.verifyToken(authToken);
+    if (!isValidToken) {
+      throw new Error("[Unauthorized] Invalid token");
+    }
     const user: UserDto | null = await this.userDao.getUser(alias);
     return user;
   };

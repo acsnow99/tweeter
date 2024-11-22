@@ -5,7 +5,7 @@ export interface AuthDao {
     createUserPassword: (alias: string, password: string) => Promise<string | null>;
     createSession: (alias: string, password: string) => Promise<AuthTokenDto | null>;
     deleteSession: (authToken: AuthTokenDto) => void;
-    verifyToken: (authToken: AuthTokenDto) => boolean;
+    verifyToken: (authToken: AuthTokenDto) => Promise<boolean>;
     // returns alias if valid authToken
     readSession: (authToken: AuthTokenDto) => string | null;
 }

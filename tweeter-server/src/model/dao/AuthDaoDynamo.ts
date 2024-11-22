@@ -14,6 +14,7 @@ export class AuthDaoDynamo implements AuthDao {
     private readonly passwordAttr = "password";
     private readonly tokenAttr = "token";
     private readonly timestampAttr = "timestamp";
+    private readonly tokenTTL = 24 * 60 * 60 * 1000;
 
     public async createUserPassword(alias: string, password: string) {
         const salt = await genSalt();
@@ -61,8 +62,17 @@ export class AuthDaoDynamo implements AuthDao {
         return;
     }
 
-    public verifyToken(authToken: AuthTokenDto) {
-        return true;
+    public async verifyToken(authToken: AuthTokenDto) {
+        const getCommand = new GetCommand({
+            TableName: this.sessionTableName,
+            Key: {
+                [this.tokenAttr]: authToken.token,
+            },
+        });
+        const getResponse = await this.client.send(getCommand);
+        const exists = getResponse.Item ? getResponse.Item.token ? true : false : false;
+        const isRecent = getResponse.Item ? Date.now() - getResponse.Item.timestamp <= this.tokenTTL : false;
+        return exists && isRecent;
     }
 
     public readSession(authToken: AuthTokenDto) {
