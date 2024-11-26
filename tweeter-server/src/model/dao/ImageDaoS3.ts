@@ -41,6 +41,7 @@ export class ImageDaoS3 implements ImageDao {
         }
         const command = new GetObjectCommand(params);
         const response = await client.send(command);
+        console.log("Response from get image", response.Body);
 
         // The `Body` in the response is a readable stream
         const streamToString = (stream: Readable) =>
@@ -51,7 +52,7 @@ export class ImageDaoS3 implements ImageDao {
                 stream.on('error', reject);
             });
 
-        const data: string = "";
+        const data = streamToString(response.Body as Readable);
         return data;
     }
 }

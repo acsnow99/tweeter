@@ -3,6 +3,8 @@ import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
 import { RegisterRequest } from "tweeter-shared";
 import { handler as loginHandler } from "./lambda/auth/Login";
+import { ImageDaoS3 } from "./model/dao/ImageDaoS3";
+import fs from 'fs';
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -33,15 +35,28 @@ const getUserTest = async () => {
 }
 
 const registerTest = async () => {
+    let uint8Array: Uint8Array = new Uint8Array();
+    const filePath = "test-images/spr_select.png";
+    fs.readFile(filePath, (err, data) => {
+          if (err) {
+              console.error('Error reading file:', err);
+              return;
+          }
+          uint8Array = new Uint8Array(data);
+      console.log("Data from file 1", uint8Array);
+      });
+    console.log("Data from file", uint8Array);
+    const alias = generateRandomString(10);
     const registerRequest: RegisterRequest = {
         firstName: generateRandomString(4),
         lastName: generateRandomString(4),
-        alias: `${generateRandomString(10)}`,
+        alias: `${alias}`,
         password: 'password',
-        userImageBytes: new Uint8Array(0),
+        userImageBytes: uint8Array,
         imageFileExtension: 'jpg'
       }
     console.log(await registerHandler(registerRequest));
+    console.log("Got image", await new ImageDaoS3().getImage(alias))
 }
 
 const loginTest = async () => {
