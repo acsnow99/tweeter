@@ -51,7 +51,8 @@ export class AuthDaoDynamo implements AuthDao {
             TableName: this.sessionTableName,
             Item: {
               [this.tokenAttr]: token,
-              [this.timestampAttr]: authToken.timestamp
+              [this.timestampAttr]: authToken.timestamp,
+              [this.aliasAttr]: alias
             },
         };
         await this.client.send(new PutCommand(params));
@@ -62,11 +63,11 @@ export class AuthDaoDynamo implements AuthDao {
         return;
     }
 
-    public async verifyToken(authToken: AuthTokenDto) {
+    public async verifyToken(token: string) {
         const getCommand = new GetCommand({
             TableName: this.sessionTableName,
             Key: {
-                [this.tokenAttr]: authToken.token,
+                [this.tokenAttr]: token,
             },
         });
         const getResponse = await this.client.send(getCommand);
@@ -75,7 +76,16 @@ export class AuthDaoDynamo implements AuthDao {
         return exists && isRecent;
     }
 
-    public readSession(authToken: AuthTokenDto) {
-        return FakeData.instance.firstUser?.alias ? FakeData.instance.firstUser?.alias : null;
+    public async readSession(token: string) {
+        const getCommand = new GetCommand({
+            TableName: this.sessionTableName,
+            Key: {
+                [this.tokenAttr]: token,
+            },
+        });
+        const getResponse = await this.client.send(getCommand);
+        console.log("Reading session", getResponse.Item);
+        const alias = getResponse.Item ? getResponse.Item.alias ? getResponse.Item.alias : null : null;
+        return alias;
     }
 }

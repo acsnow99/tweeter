@@ -1,10 +1,5 @@
-import { AuthToken, FakeData } from "tweeter-shared";
-import { AuthDao } from "./AuthDao";
-import { AuthTokenDto } from "tweeter-shared/src";
-import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { compare, genSalt, hash } from "bcryptjs";
-import crypto from 'crypto';
 import { FollowDao } from "./FollowDao";
 
 export class FollowDaoDynamo implements FollowDao {
@@ -15,7 +10,7 @@ export class FollowDaoDynamo implements FollowDao {
     private readonly followeeNameAttr = "followee-name";
     private readonly followerNameAttr = "follower-name";
 
-    public async createFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string) {
+    public async insertFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string) {
         const params = {
             TableName: this.tableName,
             Item: {
@@ -28,11 +23,30 @@ export class FollowDaoDynamo implements FollowDao {
         await this.client.send(new PutCommand(params));
     }
 
-    public async deleteFollowRelationship(alias: string, toUnfollowAlias: string, name: string, toUnfollowName: string) {
+    public async deleteFollowRelationship(alias: string, toUnfollowAlias: string) {
         const params = {
             TableName: this.tableName,
-            Key: "follows-index"
+            Key: {
+              [this.followeeAttr]: toUnfollowAlias,
+              [this.followerAttr]: alias,
+            },
           };
         await this.client.send(new DeleteCommand(params));
+    }
+
+    public getFollowers(alias: string) {
+      return [];
+    }
+
+    public getFollowees(alias: string) {
+      return [];
+    }
+
+    public getFollowerCount(alias: string) {
+      return 0;
+    }
+
+    public getFolloweeCount(alias: string) {
+      return 0;
     }
 }

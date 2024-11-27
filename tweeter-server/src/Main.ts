@@ -1,6 +1,8 @@
-import { GetUserRequest, LoginRequest } from "tweeter-shared";
+import { FollowRequest, GetUserRequest, LoginRequest } from "tweeter-shared";
 import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
+import { handler as followHandler } from "./lambda/follow/Follow"
+import { handler as unfollowHandler } from "./lambda/follow/Unfollow"
 import { RegisterRequest } from "tweeter-shared";
 import { handler as loginHandler } from "./lambda/auth/Login";
 import { ImageDaoS3 } from "./model/dao/ImageDaoS3";
@@ -67,4 +69,40 @@ const loginTest = async () => {
   console.log(await loginHandler(loginRequest));
 }
 
-registerTest();
+const followTest = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const followRequest: FollowRequest = {
+    token: loginResponse.token,
+    user: {
+      firstName: "Me",
+      lastName: "Son",
+      alias: "me",
+      imageUrl: "google.com"
+    }
+  }
+  console.log(await followHandler(followRequest));
+}
+
+const unfollowTest = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const followRequest: FollowRequest = {
+    token: loginResponse.token,
+    user: {
+      firstName: "Me",
+      lastName: "Son",
+      alias: "me",
+      imageUrl: "google.com"
+    }
+  }
+  console.log(await unfollowHandler(followRequest));
+}
+
+unfollowTest();

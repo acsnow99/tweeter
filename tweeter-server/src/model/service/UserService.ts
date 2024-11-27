@@ -6,17 +6,20 @@ import { DaoFactory } from "../dao/DaoFactory";
 import { UserDao } from "../dao/UserDao";
 import { AuthDao } from "../dao/AuthDao";
 import { ImageDao } from "../dao/ImageDao";
+import { FollowDao } from "../dao/FollowDao";
 
 export class UserService {
   private daoFactory: DaoFactory;
   private userDao: UserDao;
   private authDao: AuthDao;
+  private followDao: FollowDao;
   private imageDao: ImageDao;
 
   constructor(daoFactory: DaoFactory) {
     this.daoFactory = daoFactory;
     this.userDao = daoFactory.getUserDao();
     this.authDao = daoFactory.getAuthDao();
+    this.followDao = daoFactory.getFollowDao();
     this.imageDao = daoFactory.getImageDao();
   }
 
@@ -58,7 +61,7 @@ export class UserService {
     // check for existing user with the alias
     const existingUser = await this.userDao.getUser(alias);
     if (existingUser !== null) {
-      throw new Error("Invalid registration: alias already taken");
+      throw new Error("[Bad Request]] alias already taken");
     }
 
     const imageUrl = await this.imageDao.putImage(alias, imageStringBase64);
@@ -104,7 +107,7 @@ export class UserService {
     authToken: AuthTokenDto,
     alias: string
   ): Promise<UserDto | null> {
-    const isValidToken = await this.authDao.verifyToken(authToken);
+    const isValidToken = await this.authDao.verifyToken(authToken.token);
     if (!isValidToken) {
       throw new Error("[Unauthorized] Invalid token");
     }
@@ -141,7 +144,8 @@ export class UserService {
     // Pause so we can see the follow message. Remove when connected to the server
     await new Promise((f) => setTimeout(f, 2000));
 
-    // TODO: Call the server
+    const user = await this.getUserFromToken(token);
+    this.followDao.insertFollowRelationship(user.alias, userToFollow.alias, `${user.lastName}, ${user.firstName}`, `${userToFollow.lastName}, ${userToFollow.firstName}`);
 
     const followerCount = await this.getFollowerCount(token, userToFollow);
     const followeeCount = await this.getFolloweeCount(token, userToFollow);
@@ -156,11 +160,26 @@ export class UserService {
     // Pause so we can see the unfollow message. Remove when connected to the server
     await new Promise((f) => setTimeout(f, 2000));
 
-    // TODO: Call the server
+    const user = await this.getUserFromToken(token);
+    this.followDao.deleteFollowRelationship(user.alias, userToUnfollow.alias);
 
     const followerCount = await this.getFollowerCount(token, userToUnfollow);
     const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
 
     return [followerCount, followeeCount];
   };
+
+  private async getUserFromToken(token: string) {
+    const isValidToken = await this.authDao.verifyToken(token);
+    const alias = await this.authDao.readSession(token);
+    console.log("isValid and alias from getUserFromToken", isValidToken, alias);
+    if (!isValidToken || !alias) {
+      throw new Error("[Unauthorized] Invalid token");
+    }
+    const user = await this.userDao.getUser(alias);
+    if (!user) {
+      throw new Error("[Server error] Could not find user");
+    }
+    return user;
+  }
 }
