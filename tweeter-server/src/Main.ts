@@ -189,7 +189,7 @@ const getFolloweesTest = async () => {
   const token = loginResponse.token;
   const getFolloweesRequest: PagedUserItemRequest = {
     token: token,
-    userAlias: "me",
+    userAlias: "bI9jCRnZVP",
     pageSize: 10,
     lastItem: null
   }

@@ -132,6 +132,7 @@ export class UserService {
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
     const allFollowees = await this.followDao.getFollowees(userAlias);
+    console.log("allFollowees", allFollowees);
     return await this.loadUserItems(allFollowees, lastItem, pageSize);
   };
 
