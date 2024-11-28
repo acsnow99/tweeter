@@ -1,4 +1,4 @@
-import { FollowRequest, GetUserRequest, LoginRequest } from "tweeter-shared";
+import { FollowRequest, GetUserRequest, LoginRequest, PagedUserItemRequest } from "tweeter-shared";
 import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
 import { handler as followHandler } from "./lambda/follow/Follow"
@@ -7,6 +7,7 @@ import { RegisterRequest } from "tweeter-shared";
 import { handler as loginHandler } from "./lambda/auth/Login";
 import { ImageDaoS3 } from "./model/dao/ImageDaoS3";
 import fs from 'fs';
+import { handler as getFollowersHandler } from "./lambda/follow/GetFollowersLambda";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -70,21 +71,33 @@ const loginTest = async () => {
 }
 
 const followTest = async () => {
-  const loginRequest: LoginRequest = {
-    alias: "bI9jCRnZVP",
-    password: "password"
-  };
-  const loginResponse = await loginHandler(loginRequest);
-  const followRequest: FollowRequest = {
-    token: loginResponse.token,
-    user: {
-      firstName: "Me",
-      lastName: "Son",
-      alias: "me",
-      imageUrl: "google.com"
+  for (let i = 0; i < 20; i++) {
+    const alias = generateRandomString(10);
+    const registerRequest: RegisterRequest = {
+        firstName: generateRandomString(4),
+        lastName: generateRandomString(4),
+        alias: `${alias}`,
+        password: 'password',
+        userImageBytes: new Uint8Array(),
+        imageFileExtension: 'jpg'
+      }
+    await registerHandler(registerRequest);
+    const loginRequest: LoginRequest = {
+      alias: alias,
+      password: "password"
+    };
+    const loginResponse = await loginHandler(loginRequest);
+    const followRequest: FollowRequest = {
+      token: loginResponse.token,
+      user: {
+        firstName: "Me",
+        lastName: "Son",
+        alias: "me",
+        imageUrl: "google.com"
+      }
     }
+    await followHandler(followRequest);
   }
-  console.log(await followHandler(followRequest));
 }
 
 const unfollowTest = async () => {
@@ -105,4 +118,26 @@ const unfollowTest = async () => {
   console.log(await unfollowHandler(followRequest));
 }
 
-unfollowTest();
+const getFollowersTest = async () => {
+  const alias = "bI9jCRnZVP";
+  const loginRequest: LoginRequest = {
+    alias: alias,
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const token = loginResponse.token;
+  const getFollowersRequest: PagedUserItemRequest = {
+    token: token,
+    userAlias: "me",
+    pageSize: 10,
+    lastItem: {
+      firstName: "what",
+      lastName: "no",
+      alias: "kT2Jzkdioq",
+      imageUrl: "google.com"
+    }
+  }
+  console.log(await getFollowersHandler(getFollowersRequest));
+}
+
+getFollowersTest();

@@ -1,6 +1,7 @@
-import { DeleteCommand, DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { FollowDao } from "./FollowDao";
+import { User } from "tweeter-shared";
 
 export class FollowDaoDynamo implements FollowDao {
     private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
@@ -9,8 +10,9 @@ export class FollowDaoDynamo implements FollowDao {
     private readonly followerAttr = "follower-alias";
     private readonly followeeNameAttr = "followee-name";
     private readonly followerNameAttr = "follower-name";
+    private readonly followerImageAttr = "follower-image";
 
-    public async insertFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string) {
+    public async insertFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string, imageUrl: string) {
         const params = {
             TableName: this.tableName,
             Item: {
@@ -18,6 +20,7 @@ export class FollowDaoDynamo implements FollowDao {
               [this.followerAttr]: alias,
               [this.followeeNameAttr]: toFollowName,
               [this.followerNameAttr]: name,
+              [this.followerImageAttr]: imageUrl,
             },
           };
         await this.client.send(new PutCommand(params));
@@ -34,19 +37,34 @@ export class FollowDaoDynamo implements FollowDao {
         await this.client.send(new DeleteCommand(params));
     }
 
-    public getFollowers(alias: string) {
+    public async getFollowers(alias: string) {
+      const getCommand = new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: `#followeeAttr = :aliasValue`,
+        ExpressionAttributeNames: {
+          '#followeeAttr': this.followeeAttr
+        },
+        ExpressionAttributeValues: {
+          ":aliasValue": alias,
+        },
+      });
+      const getResponse = await this.client.send(getCommand);
+      const followers = getResponse.Items ? getResponse.Items.map((item) => {
+        const [lastName, firstName] = item[this.followerNameAttr].split(", ");
+        return new User(firstName, lastName, item[this.followerAttr], item[this.followerImageAttr]).dto;
+      }) : [];
+      return followers;
+    }
+
+    public async getFollowees(alias: string) {
       return [];
     }
 
-    public getFollowees(alias: string) {
-      return [];
-    }
-
-    public getFollowerCount(alias: string) {
+    public async getFollowerCount(alias: string) {
       return 0;
     }
 
-    public getFolloweeCount(alias: string) {
+    public async getFolloweeCount(alias: string) {
       return 0;
     }
 }

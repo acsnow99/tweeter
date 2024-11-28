@@ -121,9 +121,23 @@ export class UserService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
-    return [items.map((user) => user.dto), hasMore];
+    const allFollowers = await this.followDao.getFollowers(userAlias);
+    let followersResult: UserDto[] = [];
+    let foundLastItem = false;
+    let i = 0;
+    let hasMore = false;
+    allFollowers.forEach((follower) => {
+      if ((lastItem === null || foundLastItem) && i < pageSize) {
+        followersResult.push(follower);
+        i += 1;
+      } else if (i >= 10) {
+        hasMore = true;
+      }
+      if (lastItem !== null && follower.alias === lastItem.alias) {
+        foundLastItem = true;
+      }
+    })
+    return [followersResult, hasMore];
   };
 
   public async loadMoreFollowees(
@@ -145,7 +159,13 @@ export class UserService {
     await new Promise((f) => setTimeout(f, 2000));
 
     const user = await this.getUserFromToken(token);
-    this.followDao.insertFollowRelationship(user.alias, userToFollow.alias, `${user.lastName}, ${user.firstName}`, `${userToFollow.lastName}, ${userToFollow.firstName}`);
+    this.followDao.insertFollowRelationship(
+      user.alias, 
+      userToFollow.alias, 
+      `${user.lastName}, ${user.firstName}`, 
+      `${userToFollow.lastName}, ${userToFollow.firstName}`,
+      user.imageUrl
+    );
 
     const followerCount = await this.getFollowerCount(token, userToFollow);
     const followeeCount = await this.getFolloweeCount(token, userToFollow);
