@@ -11,8 +11,9 @@ export class FollowDaoDynamo implements FollowDao {
     private readonly followeeNameAttr = "followee-name";
     private readonly followerNameAttr = "follower-name";
     private readonly followerImageAttr = "follower-image";
+    private readonly followeeImageAttr = "followee-image";
 
-    public async insertFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string, imageUrl: string) {
+    public async insertFollowRelationship(alias: string, toFollowAlias: string, name: string, toFollowName: string, imageUrl: string, toFollowImageUrl: string) {
         const params = {
             TableName: this.tableName,
             Item: {
@@ -21,6 +22,7 @@ export class FollowDaoDynamo implements FollowDao {
               [this.followeeNameAttr]: toFollowName,
               [this.followerNameAttr]: name,
               [this.followerImageAttr]: imageUrl,
+              [this.followeeImageAttr]: toFollowImageUrl
             },
           };
         await this.client.send(new PutCommand(params));
@@ -57,7 +59,22 @@ export class FollowDaoDynamo implements FollowDao {
     }
 
     public async getFollowees(alias: string) {
-      return [];
+      const getCommand = new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: `#followerAttr = :aliasValue`,
+        ExpressionAttributeNames: {
+          '#followerAttr': this.followerAttr
+        },
+        ExpressionAttributeValues: {
+          ":aliasValue": alias,
+        },
+      });
+      const getResponse = await this.client.send(getCommand);
+      const followees = getResponse.Items ? getResponse.Items.map((item) => {
+        const [lastName, firstName] = item[this.followeeNameAttr].split(", ");
+        return new User(firstName, lastName, item[this.followeeAttr], item[this.followeeImageAttr]).dto;
+      }) : [];
+      return followees;
     }
 
     public async getFollowerCount(alias: string) {

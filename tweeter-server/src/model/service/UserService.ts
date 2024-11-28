@@ -122,22 +122,7 @@ export class UserService {
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
     const allFollowers = await this.followDao.getFollowers(userAlias);
-    let followersResult: UserDto[] = [];
-    let foundLastItem = false;
-    let i = 0;
-    let hasMore = false;
-    allFollowers.forEach((follower) => {
-      if ((lastItem === null || foundLastItem) && i < pageSize) {
-        followersResult.push(follower);
-        i += 1;
-      } else if (i >= 10) {
-        hasMore = true;
-      }
-      if (lastItem !== null && follower.alias === lastItem.alias) {
-        foundLastItem = true;
-      }
-    })
-    return [followersResult, hasMore];
+    return await this.loadUserItems(allFollowers, lastItem, pageSize);
   };
 
   public async loadMoreFollowees(
@@ -146,10 +131,28 @@ export class UserService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
-    return [items.map((user) => user.dto), hasMore];
+    const allFollowees = await this.followDao.getFollowees(userAlias);
+    return await this.loadUserItems(allFollowees, lastItem, pageSize);
   };
+
+  private async loadUserItems(allItems: UserDto[], lastItem: UserDto | null, pageSize: number): Promise<[UserDto[], boolean]> {
+    let result: UserDto[] = [];
+    let foundLastItem = false;
+    let i = 0;
+    let hasMore = false;
+    allItems.forEach((item) => {
+      if ((lastItem === null || foundLastItem) && i < pageSize) {
+        result.push(item);
+        i += 1;
+      } else if (i >= 10) {
+        hasMore = true;
+      }
+      if (lastItem !== null && item.alias === lastItem.alias) {
+        foundLastItem = true;
+      }
+    })
+    return [result, hasMore];
+  }
 
   public async follow(
     token: string,
@@ -164,7 +167,8 @@ export class UserService {
       userToFollow.alias, 
       `${user.lastName}, ${user.firstName}`, 
       `${userToFollow.lastName}, ${userToFollow.firstName}`,
-      user.imageUrl
+      user.imageUrl,
+      userToFollow.imageUrl
     );
 
     const followerCount = await this.getFollowerCount(token, userToFollow);

@@ -8,6 +8,7 @@ import { handler as loginHandler } from "./lambda/auth/Login";
 import { ImageDaoS3 } from "./model/dao/ImageDaoS3";
 import fs from 'fs';
 import { handler as getFollowersHandler } from "./lambda/follow/GetFollowersLambda";
+import { handler as getFolloweesHandler } from "./lambda/follow/GetFolloweesLambda";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -71,6 +72,24 @@ const loginTest = async () => {
 }
 
 const followTest = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const followRequest: FollowRequest = {
+    token: loginResponse.token,
+    user: {
+      firstName: "Me",
+      lastName: "Son",
+      alias: "me",
+      imageUrl: "google.com"
+    }
+  }
+  console.log(await followHandler(followRequest));
+}
+
+const populateFollowers = async () => {
   for (let i = 0; i < 20; i++) {
     const alias = generateRandomString(10);
     const registerRequest: RegisterRequest = {
@@ -93,6 +112,26 @@ const followTest = async () => {
         firstName: "Me",
         lastName: "Son",
         alias: "me",
+        imageUrl: "google.com"
+      }
+    }
+    await followHandler(followRequest);
+  }
+}
+
+const populateFollowees = async () => {
+  const loginRequest: LoginRequest = {
+    alias: "bI9jCRnZVP",
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  for (let i = 0; i < 20; i++) {
+    const followRequest: FollowRequest = {
+      token: loginResponse.token,
+      user: {
+        firstName: generateRandomString(4),
+        lastName: generateRandomString(4),
+        alias: generateRandomString(10),
         imageUrl: "google.com"
       }
     }
@@ -140,4 +179,21 @@ const getFollowersTest = async () => {
   console.log(await getFollowersHandler(getFollowersRequest));
 }
 
-getFollowersTest();
+const getFolloweesTest = async () => {
+  const alias = "bI9jCRnZVP";
+  const loginRequest: LoginRequest = {
+    alias: alias,
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const token = loginResponse.token;
+  const getFolloweesRequest: PagedUserItemRequest = {
+    token: token,
+    userAlias: "me",
+    pageSize: 10,
+    lastItem: null
+  }
+  console.log(await getFolloweesHandler(getFolloweesRequest));
+}
+
+getFolloweesTest();
