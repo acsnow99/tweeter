@@ -111,4 +111,22 @@ export class FollowDaoDynamo implements FollowDao {
       const getResponse = await this.client.send(getCommand);
       return getResponse.Count ?? 0;
     }
+
+    public async getIsFollower(followerAlias: string, followeeAlias: string): Promise<boolean> {
+      const getCommand = new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: `#followeeAttr = :followeeValue AND #followerAttr = :followerValue`,
+        ExpressionAttributeNames: {
+          '#followeeAttr': this.followeeAttr,
+          '#followerAttr': this.followerAttr, 
+        },
+        ExpressionAttributeValues: {
+          ":followeeValue": followeeAlias,
+          ":followerValue": followerAlias,
+        },
+      });
+      const getResponse = await this.client.send(getCommand);
+      console.log("isFollower items", getResponse.Items);
+      return getResponse.Items?.length !== 0 && getResponse.Items !== undefined;
+    }
 }

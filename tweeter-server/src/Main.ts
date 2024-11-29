@@ -1,4 +1,4 @@
-import { FollowRequest, GetUserRequest, LoginRequest, PagedUserItemRequest } from "tweeter-shared";
+import { FollowRequest, GetIsFollowerStatusRequest, GetUserRequest, LoginRequest, PagedUserItemRequest } from "tweeter-shared";
 import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
 import { handler as followHandler } from "./lambda/follow/Follow"
@@ -9,6 +9,7 @@ import { ImageDaoS3 } from "./model/dao/ImageDaoS3";
 import fs from 'fs';
 import { handler as getFollowersHandler } from "./lambda/follow/GetFollowersLambda";
 import { handler as getFolloweesHandler } from "./lambda/follow/GetFolloweesLambda";
+import { handler as getIsFollowerStatusHandler } from "./lambda/follow/GetIsFollowerStatus";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -196,4 +197,33 @@ const getFolloweesTest = async () => {
   console.log(await getFolloweesHandler(getFolloweesRequest));
 }
 
-populateFollowers();
+const getIsFollowerStatusTest = async () => {
+  const alias = "bI9jCRnZVP";
+  const loginRequest: LoginRequest = {
+    alias: alias,
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const token = loginResponse.token;
+  const request: GetIsFollowerStatusRequest = {
+    authToken: {
+      token: token,
+      timestamp: 0,
+    },
+    user: {
+      firstName: "what",
+      lastName: "no",
+      alias: "bI9jCRnZVP",
+      imageUrl: "google.com"
+    },
+    selectedUser: {
+      firstName: "what",
+      lastName: "no",
+      alias: "me",
+      imageUrl: "google.com"
+    }
+  }
+  console.log(await getIsFollowerStatusHandler(request));
+}
+
+getIsFollowerStatusTest();

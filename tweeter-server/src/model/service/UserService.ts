@@ -82,22 +82,21 @@ export class UserService {
     user: UserDto,
     selectedUser: UserDto
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    return await this.followDao.getIsFollower(user.alias, selectedUser.alias);
   };
 
   public async getFollowerCount(
     token: string,
     user: UserDto | null
   ): Promise<number> {
-    return this.followDao.getFollowerCount(user?.alias ? user?.alias : '');
+    return await this.followDao.getFollowerCount(user?.alias ? user?.alias : '');
   };
 
   public async getFolloweeCount(
     token: string,
     user: UserDto | null
   ): Promise<number> {
-    return this.followDao.getFolloweeCount(user?.alias ? user?.alias : '');
+    return await this.followDao.getFolloweeCount(user?.alias ? user?.alias : '');
   };
 
   private async validateToken(token: string) {

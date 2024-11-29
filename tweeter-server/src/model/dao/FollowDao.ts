@@ -8,4 +8,5 @@ export interface FollowDao {
     readonly getFollowees: (alias: string) => Promise<UserDto[]>;
     readonly getFollowerCount: (alias: string) => Promise<number>;
     readonly getFolloweeCount: (alias: string) => Promise<number>;
+    readonly getIsFollower: (alias: string, toCheckAlias: string) => Promise<boolean>;
 }
