@@ -84,7 +84,6 @@ export class AuthDaoDynamo implements AuthDao {
             },
         });
         const getResponse = await this.client.send(getCommand);
-        console.log("Reading session", getResponse.Item);
         const alias = getResponse.Item ? getResponse.Item.alias ? getResponse.Item.alias : null : null;
         return alias;
     }

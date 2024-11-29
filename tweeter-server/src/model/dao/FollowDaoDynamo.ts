@@ -72,20 +72,43 @@ export class FollowDaoDynamo implements FollowDao {
         },
       });
       const getResponse = await this.client.send(getCommand);
-      console.log("getFollowees", getResponse.Items);
       const followees = getResponse.Items ? getResponse.Items.map((item) => {
         const [lastName, firstName] = item[this.followeeNameAttr].split(", ");
         return new User(firstName, lastName, item[this.followeeAttr], item[this.followeeImageAttr]).dto;
       }) : [];
-      console.log("getFollowees post process", followees);
       return followees;
     }
 
     public async getFollowerCount(alias: string) {
-      return 0;
+      const getCommand = new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: `#followeeAttr = :aliasValue`,
+        ExpressionAttributeNames: {
+          '#followeeAttr': this.followeeAttr
+        },
+        ExpressionAttributeValues: {
+          ":aliasValue": alias,
+        },
+        Select: "COUNT",
+      });
+      const getResponse = await this.client.send(getCommand);
+      return getResponse.Count ?? 0;
     }
 
     public async getFolloweeCount(alias: string) {
-      return 0;
+      const getCommand = new QueryCommand({
+        TableName: this.tableName,
+        IndexName: this.altIndexName,
+        KeyConditionExpression: `#followerAttr = :aliasValue`,
+        ExpressionAttributeNames: {
+          '#followerAttr': this.followerAttr,
+        },
+        ExpressionAttributeValues: {
+          ":aliasValue": alias,
+        },
+        Select: "COUNT",
+      });
+      const getResponse = await this.client.send(getCommand);
+      return getResponse.Count ?? 0;
     }
 }

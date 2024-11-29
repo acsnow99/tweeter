@@ -90,27 +90,29 @@ export class UserService {
     token: string,
     user: UserDto | null
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user?.alias ? user?.alias : '');
+    return this.followDao.getFollowerCount(user?.alias ? user?.alias : '');
   };
 
   public async getFolloweeCount(
     token: string,
     user: UserDto | null
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user?.alias ? user?.alias : '');
+    return this.followDao.getFolloweeCount(user?.alias ? user?.alias : '');
   };
+
+  private async validateToken(token: string) {
+    const isValidToken = await this.authDao.verifyToken(token);
+    if (!isValidToken) {
+      throw new Error("[Unauthorized] Invalid token");
+    }
+  }
 
       
   public async getUser (
     authToken: AuthTokenDto,
     alias: string
   ): Promise<UserDto | null> {
-    const isValidToken = await this.authDao.verifyToken(authToken.token);
-    if (!isValidToken) {
-      throw new Error("[Unauthorized] Invalid token");
-    }
+    await this.validateToken(authToken.token);
     const user: UserDto | null = await this.userDao.getUser(alias);
     return user;
   };
@@ -121,6 +123,7 @@ export class UserService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
+    this.validateToken(token);
     const allFollowers = await this.followDao.getFollowers(userAlias);
     return await this.loadUserItems(allFollowers, lastItem, pageSize);
   };
@@ -131,8 +134,8 @@ export class UserService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
+    this.validateToken(token);
     const allFollowees = await this.followDao.getFollowees(userAlias);
-    console.log("allFollowees", allFollowees);
     return await this.loadUserItems(allFollowees, lastItem, pageSize);
   };
 
@@ -159,11 +162,8 @@ export class UserService {
     token: string,
     userToFollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
     const user = await this.getUserFromToken(token);
-    this.followDao.insertFollowRelationship(
+    await this.followDao.insertFollowRelationship(
       user.alias, 
       userToFollow.alias, 
       `${user.lastName}, ${user.firstName}`, 
@@ -182,11 +182,8 @@ export class UserService {
     token: string,
     userToUnfollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
     const user = await this.getUserFromToken(token);
-    this.followDao.deleteFollowRelationship(user.alias, userToUnfollow.alias);
+    await this.followDao.deleteFollowRelationship(user.alias, userToUnfollow.alias);
 
     const followerCount = await this.getFollowerCount(token, userToUnfollow);
     const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
@@ -195,11 +192,10 @@ export class UserService {
   };
 
   private async getUserFromToken(token: string) {
-    const isValidToken = await this.authDao.verifyToken(token);
+    this.validateToken(token);
     const alias = await this.authDao.readSession(token);
-    console.log("isValid and alias from getUserFromToken", isValidToken, alias);
-    if (!isValidToken || !alias) {
-      throw new Error("[Unauthorized] Invalid token");
+    if (!alias) {
+      throw new Error("[Unauthorized] Token does not match a user");
     }
     const user = await this.userDao.getUser(alias);
     if (!user) {

@@ -90,7 +90,7 @@ const followTest = async () => {
 }
 
 const populateFollowers = async () => {
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     const alias = generateRandomString(10);
     const registerRequest: RegisterRequest = {
         firstName: generateRandomString(4),
@@ -111,11 +111,11 @@ const populateFollowers = async () => {
       user: {
         firstName: "Me",
         lastName: "Son",
-        alias: "me",
+        alias: "bI9jCRnZVP",
         imageUrl: "google.com"
       }
     }
-    await followHandler(followRequest);
+    console.log(await followHandler(followRequest));
   }
 }
 
@@ -125,7 +125,7 @@ const populateFollowees = async () => {
     password: "password"
   };
   const loginResponse = await loginHandler(loginRequest);
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     const followRequest: FollowRequest = {
       token: loginResponse.token,
       user: {
@@ -135,7 +135,7 @@ const populateFollowees = async () => {
         imageUrl: "google.com"
       }
     }
-    await followHandler(followRequest);
+    console.log(await followHandler(followRequest));
   }
 }
 
@@ -196,4 +196,4 @@ const getFolloweesTest = async () => {
   console.log(await getFolloweesHandler(getFolloweesRequest));
 }
 
-getFolloweesTest();
+populateFollowers();
