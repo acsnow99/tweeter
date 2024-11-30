@@ -1,6 +1,7 @@
 import { AuthDao } from "./AuthDao";
 import { FollowDao } from "./FollowDao";
 import { ImageDao } from "./ImageDao";
+import { StatusDao } from "./StatusDao";
 import { UserDao } from "./UserDao";
 
 export interface DaoFactory {
@@ -8,4 +9,5 @@ export interface DaoFactory {
     readonly getAuthDao: () => AuthDao;
     readonly getFollowDao: () => FollowDao;
     readonly getImageDao: () => ImageDao;
+    readonly getStatusDao: () => StatusDao;
 }

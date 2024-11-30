@@ -1,4 +1,4 @@
-import { FollowRequest, GetIsFollowerStatusRequest, GetUserRequest, LoginRequest, PagedUserItemRequest } from "tweeter-shared";
+import { FollowRequest, GetIsFollowerStatusRequest, GetUserRequest, LoginRequest, PagedUserItemRequest, PostStatusRequest } from "tweeter-shared";
 import { handler as getUserHandler } from "./lambda/getUser/GetUser"
 import { handler as registerHandler } from "./lambda/auth/Register"
 import { handler as followHandler } from "./lambda/follow/Follow"
@@ -10,6 +10,7 @@ import fs from 'fs';
 import { handler as getFollowersHandler } from "./lambda/follow/GetFollowersLambda";
 import { handler as getFolloweesHandler } from "./lambda/follow/GetFolloweesLambda";
 import { handler as getIsFollowerStatusHandler } from "./lambda/follow/GetIsFollowerStatus";
+import { handler as postStatusHandler } from "./lambda/status/PostStatusLambda";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -226,4 +227,32 @@ const getIsFollowerStatusTest = async () => {
   console.log(await getIsFollowerStatusHandler(request));
 }
 
-getIsFollowerStatusTest();
+const postStatusTest = async () => {
+  const alias = "bI9jCRnZVP";
+  const loginRequest: LoginRequest = {
+    alias: alias,
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const token = loginResponse.token;
+  const request: PostStatusRequest = {
+    authToken: {
+      token: token,
+      timestamp: 0,
+    },
+    newStatus: {
+      post: "A new post from testing",
+      user: {
+        firstName: "Me",
+        lastName: "Son",
+        alias: "bI9jCRnZVP",
+        imageUrl: "google.com",
+      },
+      timestamp: Date.now(),
+      segments: []
+    }
+  }
+  console.log(await postStatusHandler(request));
+}
+
+postStatusTest();

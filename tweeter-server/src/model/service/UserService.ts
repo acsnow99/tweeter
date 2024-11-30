@@ -82,6 +82,7 @@ export class UserService {
     user: UserDto,
     selectedUser: UserDto
   ): Promise<boolean> {
+    await this.validateToken(authToken.token);
     return await this.followDao.getIsFollower(user.alias, selectedUser.alias);
   };
 

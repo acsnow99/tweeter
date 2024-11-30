@@ -1,8 +1,8 @@
 import { StatusRequest, StatusResponse } from "tweeter-shared/src";
-import { StatusService } from "../../model/service/StatusService"
+import { getStatusService } from "../utils";
 
 export const handler = async (request: StatusRequest): Promise<StatusResponse> => {
-    const service = new StatusService();
+    const service = getStatusService();
     const {
         authToken,
         userAlias,
