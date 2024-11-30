@@ -45,8 +45,30 @@ export class StatusDaoDynamo implements StatusDao {
     };
 
     public async getFeedPage(alias: string, lastItem: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
-        const feed: [StatusDto[], boolean] = [[], false];
-        return feed;
+        const params: QueryCommandInput = {
+            TableName: this.feedsTableName,
+            KeyConditionExpression: `#aliasAttr = :aliasValue`,
+            ExpressionAttributeNames: {
+              '#aliasAttr': this.followerAliasAttr
+            },
+            ExpressionAttributeValues: {
+              ":aliasValue": alias,
+            },
+            Limit: pageSize,
+            ScanIndexForward: false,
+        };
+
+        if (lastItem) {
+            params['ExclusiveStartKey'] = {
+                [this.followerAliasAttr]: alias,
+                [this.timestampAttr]: lastItem.timestamp,
+            };
+        }
+        const getCommand = new QueryCommand(params);
+        const getResponse = await this.client.send(getCommand);
+        const feeds = getResponse.Items ? getResponse.Items.map((item) => new Status(item.post, new User(item.firstName, item.lastName, item.alias, item.imageUrl), item.timestamp).dto) : [];
+        const hasMore = !!getResponse.LastEvaluatedKey;
+        return [feeds, hasMore];
     };
 
     public async createStatus(user: UserDto, newStatus: StatusDto): Promise<void> {

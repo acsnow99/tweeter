@@ -12,6 +12,7 @@ import { handler as getFolloweesHandler } from "./lambda/follow/GetFolloweesLamb
 import { handler as getIsFollowerStatusHandler } from "./lambda/follow/GetIsFollowerStatus";
 import { handler as postStatusHandler } from "./lambda/status/PostStatusLambda";
 import { handler as getStoryHandler } from "./lambda/status/LoadMoreStoryItems";
+import { handler as getFeedHandler } from "./lambda/status/LoadMoreFeedItems";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -288,4 +289,36 @@ const getStoryTest = async () => {
   console.log(await getStoryHandler(request));
 }
 
-getStoryTest();
+const getFeedTest = async () => {
+  const alias = "8bJyy7FkNi";
+  const loginRequest: LoginRequest = {
+    alias: alias,
+    password: "password"
+  };
+  const loginResponse = await loginHandler(loginRequest);
+  const token = loginResponse.token;
+  const request: StatusRequest = {
+    authToken: {
+      token: token,
+      timestamp: 0,
+    },
+    userAlias: "8bJyy7FkNi",
+    pageSize: 4,
+    // lastItem: null,
+    lastItem: {
+      post: "A new post from testing",
+      user: {
+        firstName: "Me",
+        lastName: "Son",
+        alias: "bI9jCRnZVP",
+        imageUrl: "google.com",
+      },
+      timestamp: 1733001982710,
+      segments: []
+    }
+
+  };
+  console.log(await getFeedHandler(request));
+}
+
+getFeedTest();
