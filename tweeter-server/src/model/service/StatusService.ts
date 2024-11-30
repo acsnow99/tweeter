@@ -27,9 +27,8 @@ export class StatusService {
         pageSize: number,
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
-        // TODO: Replace with the result of calling server
-        const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
-        return [statuses.map((status) => status.dto), hasMore]
+        await this.validateToken(authToken.token);
+        return await this.statusDao.getStoryPage(userAlias, lastItem, pageSize);
     };
     
     public async loadMoreFeedItems(
