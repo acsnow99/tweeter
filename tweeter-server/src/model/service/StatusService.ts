@@ -48,7 +48,9 @@ export class StatusService {
         const user = await this.getUserFromToken(authToken.token);
         await this.statusDao.createStatus(user, newStatus);
         const followers = await this.followDao.getFollowers(user.alias);
-        await this.statusDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
+        if (followers.length > 0) {
+            await this.statusDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
+        }
     };
 
     private async validateToken(token: string) {
