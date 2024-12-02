@@ -119,7 +119,7 @@ export class UserService {
     }
     const request: GetUserRequest = {
         authToken: authTokenDto,
-        alias
+        alias: alias.split('@')[1]
     }
     return await this.serverFacade.getUser(request);
   };

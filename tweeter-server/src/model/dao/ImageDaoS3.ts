@@ -19,12 +19,19 @@ export class ImageDaoS3 implements ImageDao {
             Bucket: this.bucket,
             Key: "image/" + fileName,
             Body: decodedImageBuffer,
-            ContentType: `image/${imageFileExtension}`,
+            ContentType: "image/png",
             ACL: ObjectCannedACL.public_read,
         };
         const c = new PutObjectCommand(s3Params);
         const client = new S3Client({ region: this.region });
-        return `https://${this.bucket}.s3.${this.region}.amazonaws.com/image/${fileName}`;
+        try {
+            await client.send(c);
+            return (
+            `https://${this.bucket}.s3.${this.region}.amazonaws.com/image/${fileName}`
+            );
+        } catch (error) {
+            throw Error("s3 put image failed with: " + error);
+        }
     }
 
     public async getImage(fileName: string) {
