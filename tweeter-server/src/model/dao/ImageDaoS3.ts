@@ -8,7 +8,8 @@ export class ImageDaoS3 implements ImageDao {
 
     public async putImage(
         fileName: string,
-        imageStringBase64Encoded: string
+        imageStringBase64Encoded: string,
+        imageFileExtension: string,
     ): Promise<string> {
         let decodedImageBuffer: Buffer = Buffer.from(
             imageStringBase64Encoded,
@@ -18,19 +19,12 @@ export class ImageDaoS3 implements ImageDao {
             Bucket: this.bucket,
             Key: "image/" + fileName,
             Body: decodedImageBuffer,
-            ContentType: "image/png",
+            ContentType: `image/${imageFileExtension}`,
             ACL: ObjectCannedACL.public_read,
         };
         const c = new PutObjectCommand(s3Params);
         const client = new S3Client({ region: this.region });
-        try {
-            await client.send(c);
-            return (
-            `https://${this.bucket}.s3.${this.region}.amazonaws.com/image/${fileName}`
-            );
-        } catch (error) {
-            throw Error("s3 put image failed with: " + error);
-        }
+        return `https://${this.bucket}.s3.${this.region}.amazonaws.com/image/${fileName}`;
     }
 
     public async getImage(fileName: string) {
@@ -41,7 +35,6 @@ export class ImageDaoS3 implements ImageDao {
         }
         const command = new GetObjectCommand(params);
         const response = await client.send(command);
-        console.log("Response from get image", response.Body);
 
         // The `Body` in the response is a readable stream
         const streamToString = (stream: Readable) =>

@@ -126,7 +126,6 @@ export class FollowDaoDynamo implements FollowDao {
         },
       });
       const getResponse = await this.client.send(getCommand);
-      console.log("isFollower items", getResponse.Items);
       return getResponse.Items?.length !== 0 && getResponse.Items !== undefined;
     }
 }

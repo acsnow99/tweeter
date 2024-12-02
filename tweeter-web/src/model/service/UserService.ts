@@ -43,7 +43,7 @@ export class UserService {
       lastName,
       alias,
       password,
-      userImageBytes: imageStringBase64,
+      userImageBytes,
       imageFileExtension
     }
 

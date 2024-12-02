@@ -44,24 +44,24 @@ const getUserTest = async () => {
 
 const registerTest = async () => {
     let uint8Array: Uint8Array = new Uint8Array();
-    const filePath = "test-images/spr_select.png";
+    const filePath = "/Users/alexsnow/Desktop/cs340/tweeter-web-current/tweeter-server/src/test-images/test.png";
     fs.readFile(filePath, (err, data) => {
           if (err) {
               console.error('Error reading file:', err);
               return;
           }
           uint8Array = new Uint8Array(data);
-      console.log("Data from file 1", uint8Array);
+          console.log("Data from file", uint8Array);
       });
-    console.log("Data from file", uint8Array);
-    const alias = generateRandomString(10);
+    const alias = 'imagetest' + generateRandomString(5);
+    console.log("ALIAS: ", alias);
     const registerRequest: RegisterRequest = {
         firstName: generateRandomString(4),
         lastName: generateRandomString(4),
         alias: `${alias}`,
         password: 'password',
         userImageBytes: uint8Array,
-        imageFileExtension: 'jpg'
+        imageFileExtension: 'png'
       }
     console.log(await registerHandler(registerRequest));
     console.log("Got image", await new ImageDaoS3().getImage(alias))
@@ -321,4 +321,4 @@ const getFeedTest = async () => {
   console.log(await getFeedHandler(request));
 }
 
-getFeedTest();
+registerTest();

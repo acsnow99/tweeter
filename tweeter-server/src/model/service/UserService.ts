@@ -61,10 +61,10 @@ export class UserService {
     // check for existing user with the alias
     const existingUser = await this.userDao.getUser(alias);
     if (existingUser !== null) {
-      throw new Error("[Bad Request]] alias already taken");
+      throw new Error("[Bad Request] alias already taken");
     }
 
-    const imageUrl = await this.imageDao.putImage(alias, imageStringBase64);
+    const imageUrl = await this.imageDao.putImage(alias, imageStringBase64, imageFileExtension);
   
     const user = new User(firstName, lastName, alias, imageUrl).dto;
 
