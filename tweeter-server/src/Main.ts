@@ -69,7 +69,7 @@ const registerTest = async () => {
 
 const loginTest = async () => {
   const loginRequest: LoginRequest = {
-    alias: "bI9jCRnZVP",
+    alias: "imagetestw5vmM",
     password: "password"
   };
   console.log(await loginHandler(loginRequest));
@@ -77,7 +77,7 @@ const loginTest = async () => {
 
 const followTest = async () => {
   const loginRequest: LoginRequest = {
-    alias: "bI9jCRnZVP",
+    alias: "imagetestw5vmM",
     password: "password"
   };
   const loginResponse = await loginHandler(loginRequest);
@@ -230,7 +230,7 @@ const getIsFollowerStatusTest = async () => {
 }
 
 const postStatusTest = async () => {
-  const alias = "bI9jCRnZVP";
+  const alias = "imagetestw5vmM";
   const loginRequest: LoginRequest = {
     alias: alias,
     password: "password"
@@ -247,7 +247,7 @@ const postStatusTest = async () => {
       user: {
         firstName: "Me",
         lastName: "Son",
-        alias: "bI9jCRnZVP",
+        alias: "imagetestw5vmM",
         imageUrl: "google.com",
       },
       timestamp: Date.now(),
@@ -321,4 +321,4 @@ const getFeedTest = async () => {
   console.log(await getFeedHandler(request));
 }
 
-registerTest();
+postStatusTest();

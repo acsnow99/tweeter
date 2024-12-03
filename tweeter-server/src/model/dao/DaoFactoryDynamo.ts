@@ -1,18 +1,23 @@
-import { AuthDaoDynamo } from "./AuthDaoDynamo";
 import { UserDaoDynamo } from "./UserDaoDynamo";
 import { DaoFactory } from "./DaoFactory";
 import { ImageDaoS3 } from "./ImageDaoS3";
 import { FollowDaoDynamo } from "./FollowDaoDynamo";
-import { StatusDao } from "./StatusDao";
-import { StatusDaoDynamo } from "./StatusDaoDynamo";
+import { SessionDaoDynamo } from "./SessionDaoDynamo";
+import { PasswordDaoDynamo } from "./PasswordDaoDynamo";
+import { StoryDaoDynamo } from "./StoryDaoDynamo";
+import { FeedDaoDynamo } from "./FeedDaoDynamo";
 
 export class DaoFactoryDynamo implements DaoFactory {
     public getUserDao() {
         return new UserDaoDynamo();
     }
 
-    public getAuthDao() {
-        return new AuthDaoDynamo();
+    public getSessionDao() {
+        return new SessionDaoDynamo();
+    }
+
+    public getPasswordDao() {
+        return new PasswordDaoDynamo();
     }
 
     public getFollowDao() {
@@ -23,7 +28,11 @@ export class DaoFactoryDynamo implements DaoFactory {
         return new ImageDaoS3();
     }
 
-    public getStatusDao() {
-        return new StatusDaoDynamo();
+    public getStoryDao() {
+        return new StoryDaoDynamo();
+    }
+
+    public getFeedDao() {
+        return new FeedDaoDynamo();
     }
 }

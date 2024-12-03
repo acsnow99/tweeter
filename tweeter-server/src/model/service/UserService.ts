@@ -4,21 +4,24 @@ import { UserDto } from "tweeter-shared/src";
 import { AuthTokenDto } from "tweeter-shared/src/model/dto/AuthTokenDto";
 import { DaoFactory } from "../dao/DaoFactory";
 import { UserDao } from "../dao/UserDao";
-import { AuthDao } from "../dao/AuthDao";
 import { ImageDao } from "../dao/ImageDao";
 import { FollowDao } from "../dao/FollowDao";
+import { SessionDao } from "../dao/SessionDao";
+import { PasswordDao } from "../dao/PasswordDao";
 
 export class UserService {
   private daoFactory: DaoFactory;
   private userDao: UserDao;
-  private authDao: AuthDao;
+  private sessionDao: SessionDao;
+  private passwordDao: PasswordDao;
   private followDao: FollowDao;
   private imageDao: ImageDao;
 
   constructor(daoFactory: DaoFactory) {
     this.daoFactory = daoFactory;
     this.userDao = daoFactory.getUserDao();
-    this.authDao = daoFactory.getAuthDao();
+    this.sessionDao = daoFactory.getSessionDao();
+    this.passwordDao = daoFactory.getPasswordDao();
     this.followDao = daoFactory.getFollowDao();
     this.imageDao = daoFactory.getImageDao();
   }
@@ -33,7 +36,10 @@ export class UserService {
     if (password === '') {
       throw new Error("[Bad Request] Invalid password");
     }
-    const authTokenResult = await this.authDao.createSession(alias, password);
+    if (!this.passwordDao.checkUserPassword(alias, password)) {
+      throw new Error("[Unauthorized] Invalid alias or password");
+    }
+    const authTokenResult = await this.sessionDao.createSession(alias);
     const userResult = await this.userDao.getUser(alias);
     if (userResult === null || authTokenResult === null) {
       throw new Error("[Unauthorized] Invalid alias or password");
@@ -68,8 +74,8 @@ export class UserService {
   
     const user = new User(firstName, lastName, alias, imageUrl).dto;
 
-    const aliasValidate = await this.authDao.createUserPassword(alias, password);
-    const authTokenResult = await this.authDao.createSession(alias, password);
+    const aliasValidate = await this.passwordDao.createUserPassword(alias, password);
+    const authTokenResult = await this.sessionDao.createSession(alias);
     const userResult = await this.userDao.createUser(user);
     if (aliasValidate === null || authTokenResult === null || userResult === null) {
       throw new Error("[Bad Request] Invalid registration");
@@ -101,7 +107,7 @@ export class UserService {
   };
 
   private async validateToken(token: string) {
-    const isValidToken = await this.authDao.verifyToken(token);
+    const isValidToken = await this.sessionDao.verifyToken(token);
     if (!isValidToken) {
       throw new Error("[Unauthorized] Invalid token");
     }
@@ -193,7 +199,7 @@ export class UserService {
 
   private async getUserFromToken(token: string) {
     this.validateToken(token);
-    const alias = await this.authDao.readSession(token);
+    const alias = await this.sessionDao.readSession(token);
     if (!alias) {
       throw new Error("[Unauthorized] Token does not match a user");
     }

@@ -1,22 +1,25 @@
-import { FakeData, Status, StatusDto } from "tweeter-shared";
+import { StatusDto } from "tweeter-shared";
 import { AuthTokenDto } from "tweeter-shared/dist/model/dto/AuthTokenDto";
-import { AuthDao } from "../dao/AuthDao";
-import { StatusDao } from "../dao/StatusDao";
 import { DaoFactory } from "../dao/DaoFactory";
 import { FollowDao } from "../dao/FollowDao";
 import { UserDao } from "../dao/UserDao";
+import { SessionDao } from "../dao/SessionDao";
+import { StoryDao } from "../dao/StoryDao";
+import { FeedDao } from "../dao/FeedDao";
 
 export class StatusService {
     private daoFactory: DaoFactory;
-    private authDao: AuthDao;
-    private statusDao: StatusDao;
+    private sessionDao: SessionDao;
+    private storyDao: StoryDao;
+    private feedDao: FeedDao;
     private followDao: FollowDao;
     private userDao: UserDao;
 
     public constructor(daoFactory: DaoFactory) {
         this.daoFactory = daoFactory;
-        this.authDao = daoFactory.getAuthDao();
-        this.statusDao = daoFactory.getStatusDao();
+        this.sessionDao = daoFactory.getSessionDao();
+        this.storyDao = daoFactory.getStoryDao();
+        this.feedDao = daoFactory.getFeedDao();
         this.followDao = daoFactory.getFollowDao();
         this.userDao = daoFactory.getUserDao();
     }
@@ -28,7 +31,7 @@ export class StatusService {
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
         await this.validateToken(authToken.token);
-        return await this.statusDao.getStoryPage(userAlias, lastItem, pageSize);
+        return await this.storyDao.getStoryPage(userAlias, lastItem, pageSize);
     };
     
     public async loadMoreFeedItems(
@@ -38,7 +41,7 @@ export class StatusService {
         lastItem: StatusDto | null
     ): Promise<[StatusDto[], boolean]> {
         await this.validateToken(authToken.token);
-        return await this.statusDao.getFeedPage(userAlias, lastItem, pageSize);
+        return await this.feedDao.getFeedPage(userAlias, lastItem, pageSize);
     };
 
     public async postStatus(
@@ -46,15 +49,15 @@ export class StatusService {
         newStatus: StatusDto
     ): Promise<void> {
         const user = await this.getUserFromToken(authToken.token);
-        await this.statusDao.createStatus(user, newStatus);
+        await this.storyDao.createStatus(user, newStatus);
         const followers = await this.followDao.getFollowers(user.alias);
         if (followers.length > 0) {
-            await this.statusDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
+            await this.feedDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
         }
     };
 
     private async validateToken(token: string) {
-        const isValidToken = await this.authDao.verifyToken(token);
+        const isValidToken = await this.sessionDao.verifyToken(token);
         if (!isValidToken) {
           throw new Error("[Unauthorized] Invalid token");
         }
@@ -62,7 +65,7 @@ export class StatusService {
 
     private async getUserFromToken(token: string) {
         this.validateToken(token);
-        const alias = await this.authDao.readSession(token);
+        const alias = await this.sessionDao.readSession(token);
         if (!alias) {
           throw new Error("[Unauthorized] Token does not match a user");
         }

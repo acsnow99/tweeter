@@ -1,13 +1,19 @@
 import { AuthDao } from "./AuthDao";
+import { FeedDao } from "./FeedDao";
 import { FollowDao } from "./FollowDao";
 import { ImageDao } from "./ImageDao";
+import { PasswordDao } from "./PasswordDao";
+import { SessionDao } from "./SessionDao";
 import { StatusDao } from "./StatusDao";
+import { StoryDao } from "./StoryDao";
 import { UserDao } from "./UserDao";
 
 export interface DaoFactory {
     readonly getUserDao: () => UserDao;
-    readonly getAuthDao: () => AuthDao;
+    readonly getSessionDao: () => SessionDao;
+    readonly getPasswordDao: () => PasswordDao;
     readonly getFollowDao: () => FollowDao;
     readonly getImageDao: () => ImageDao;
-    readonly getStatusDao: () => StatusDao;
+    readonly getStoryDao: () => StoryDao;
+    readonly getFeedDao: () => FeedDao;
 }
