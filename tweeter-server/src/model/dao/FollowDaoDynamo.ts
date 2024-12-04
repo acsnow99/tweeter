@@ -1,4 +1,4 @@
-import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { FollowDao } from "./FollowDao";
 import { User } from "tweeter-shared";
@@ -40,8 +40,8 @@ export class FollowDaoDynamo implements FollowDao {
         await this.client.send(new DeleteCommand(params));
     }
 
-    public async getFollowers(alias: string) {
-      const getCommand = new QueryCommand({
+    public async getFollowers(alias: string, limit?: number, startKey?: { followeeAlias: string; followerAlias: string }) {
+      const params: QueryCommandInput = {
         TableName: this.tableName,
         KeyConditionExpression: `#followeeAttr = :aliasValue`,
         ExpressionAttributeNames: {
@@ -50,8 +50,19 @@ export class FollowDaoDynamo implements FollowDao {
         ExpressionAttributeValues: {
           ":aliasValue": alias,
         },
-      });
-      const getResponse = await this.client.send(getCommand);
+      };
+
+      if (limit) {
+        params.Limit = limit;
+      }
+  
+      if (startKey) {
+          params.ExclusiveStartKey = {
+              [this.followeeAttr]: startKey.followeeAlias,
+              [this.followerAttr]: startKey.followerAlias,
+          };
+      }
+      const getResponse = await this.client.send(new QueryCommand(params));
       const followers: string[] = getResponse.Items ? getResponse.Items.map((item) => {
         return item[this.followerAttr];
       }) : [];
