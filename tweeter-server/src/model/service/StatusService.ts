@@ -1,4 +1,4 @@
-import { StatusDto } from "tweeter-shared";
+import { StatusDto, UserDto } from "tweeter-shared";
 import { AuthTokenDto } from "tweeter-shared/dist/model/dto/AuthTokenDto";
 import { DaoFactory } from "../dao/DaoFactory";
 import { FollowDao } from "../dao/FollowDao";
@@ -54,6 +54,11 @@ export class StatusService {
         const user = await this.getUserFromToken(authToken.token);
         await this.storyDao.createStatus(user, newStatus);
         await this.sqsDao.postStatus(newStatus);
+    };
+
+    public async postToFeed(status: StatusDto) {
+        const followers: string[] = (await this.followDao.getFollowers(status.user.alias)).map((follower) => follower.alias);
+        this.sqsDao.postToFeed(status, followers);
     };
 
     private async validateToken(token: string) {
