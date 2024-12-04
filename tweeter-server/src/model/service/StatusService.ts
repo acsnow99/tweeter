@@ -56,9 +56,16 @@ export class StatusService {
         await this.sqsDao.postStatus(newStatus);
     };
 
-    public async postToFeed(status: StatusDto) {
-        const followers: string[] = await this.followDao.getFollowers(status.user.alias);
-        await this.sqsDao.postToFeed(status, followers);
+    public async sendMessagePostToFeed(status: StatusDto) {
+        const alias = status.user.alias;
+        let lastItem: { followeeAlias: string; followerAlias: string } | undefined = undefined;
+        let followers: string[] = [];
+        let hasMore = true;
+        while (hasMore) {
+            [followers, hasMore] = await this.followDao.getFollowers(alias, 25, lastItem);
+            lastItem = { followeeAlias: alias, followerAlias: followers[followers.length - 1]};
+            await this.sqsDao.postToFeed(status, followers);
+        }
     };
 
     private async validateToken(token: string) {

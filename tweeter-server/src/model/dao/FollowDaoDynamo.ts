@@ -40,7 +40,7 @@ export class FollowDaoDynamo implements FollowDao {
         await this.client.send(new DeleteCommand(params));
     }
 
-    public async getFollowers(alias: string, limit?: number, startKey?: { followeeAlias: string; followerAlias: string }) {
+    public async getFollowers(alias: string, limit?: number, startKey?: { followeeAlias: string; followerAlias: string }): Promise<[string[], boolean]> {
       const params: QueryCommandInput = {
         TableName: this.tableName,
         KeyConditionExpression: `#followeeAttr = :aliasValue`,
@@ -66,7 +66,10 @@ export class FollowDaoDynamo implements FollowDao {
       const followers: string[] = getResponse.Items ? getResponse.Items.map((item) => {
         return item[this.followerAttr];
       }) : [];
-      return followers;
+
+      const hasMore = !!getResponse.LastEvaluatedKey;
+
+      return [followers, hasMore];
     }
 
     public async getFollowees(alias: string) {
