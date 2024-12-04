@@ -4,6 +4,7 @@ import { FollowDao } from "./FollowDao";
 import { ImageDao } from "./ImageDao";
 import { PasswordDao } from "./PasswordDao";
 import { SessionDao } from "./SessionDao";
+import { SQSDao } from "./SQSDao";
 import { StatusDao } from "./StatusDao";
 import { StoryDao } from "./StoryDao";
 import { UserDao } from "./UserDao";
@@ -16,4 +17,5 @@ export interface DaoFactory {
     readonly getImageDao: () => ImageDao;
     readonly getStoryDao: () => StoryDao;
     readonly getFeedDao: () => FeedDao;
+    readonly getSqsDao: () => SQSDao;
 }

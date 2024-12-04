@@ -6,6 +6,7 @@ import { UserDao } from "../dao/UserDao";
 import { SessionDao } from "../dao/SessionDao";
 import { StoryDao } from "../dao/StoryDao";
 import { FeedDao } from "../dao/FeedDao";
+import { SQSDao } from "../dao/SQSDao";
 
 export class StatusService {
     private daoFactory: DaoFactory;
@@ -14,6 +15,7 @@ export class StatusService {
     private feedDao: FeedDao;
     private followDao: FollowDao;
     private userDao: UserDao;
+    private sqsDao: SQSDao;
 
     public constructor(daoFactory: DaoFactory) {
         this.daoFactory = daoFactory;
@@ -22,6 +24,7 @@ export class StatusService {
         this.feedDao = daoFactory.getFeedDao();
         this.followDao = daoFactory.getFollowDao();
         this.userDao = daoFactory.getUserDao();
+        this.sqsDao = daoFactory.getSqsDao();
     }
 
     public async loadMoreStoryItems(
@@ -50,10 +53,7 @@ export class StatusService {
     ): Promise<void> {
         const user = await this.getUserFromToken(authToken.token);
         await this.storyDao.createStatus(user, newStatus);
-        const followers = await this.followDao.getFollowers(user.alias);
-        if (followers.length > 0) {
-            await this.feedDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
-        }
+        await this.sqsDao.postStatus(newStatus);
     };
 
     private async validateToken(token: string) {

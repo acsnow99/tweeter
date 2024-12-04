@@ -6,6 +6,8 @@ import { SessionDaoDynamo } from "./SessionDaoDynamo";
 import { PasswordDaoDynamo } from "./PasswordDaoDynamo";
 import { StoryDaoDynamo } from "./StoryDaoDynamo";
 import { FeedDaoDynamo } from "./FeedDaoDynamo";
+import { SQSDao } from "./SQSDao";
+import { SQSDaoAWS } from "./SQSDaoAWS";
 
 export class DaoFactoryDynamo implements DaoFactory {
     public getUserDao() {
@@ -34,5 +36,9 @@ export class DaoFactoryDynamo implements DaoFactory {
 
     public getFeedDao() {
         return new FeedDaoDynamo();
+    }
+
+    public getSqsDao() {
+        return new SQSDaoAWS();
     }
 }
