@@ -52,9 +52,8 @@ export class FollowDaoDynamo implements FollowDao {
         },
       });
       const getResponse = await this.client.send(getCommand);
-      const followers = getResponse.Items ? getResponse.Items.map((item) => {
-        const [lastName, firstName] = item[this.followerNameAttr].split(", ");
-        return new User(firstName, lastName, item[this.followerAttr], item[this.followerImageAttr]).dto;
+      const followers: string[] = getResponse.Items ? getResponse.Items.map((item) => {
+        return item[this.followerAttr];
       }) : [];
       return followers;
     }
@@ -72,9 +71,8 @@ export class FollowDaoDynamo implements FollowDao {
         },
       });
       const getResponse = await this.client.send(getCommand);
-      const followees = getResponse.Items ? getResponse.Items.map((item) => {
-        const [lastName, firstName] = item[this.followeeNameAttr].split(", ");
-        return new User(firstName, lastName, item[this.followeeAttr], item[this.followeeImageAttr]).dto;
+      const followees: string[] = getResponse.Items ? getResponse.Items.map((item) => {
+        return item[this.followeeAttr];
       }) : [];
       return followees;
     }

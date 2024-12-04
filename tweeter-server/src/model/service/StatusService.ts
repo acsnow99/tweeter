@@ -57,8 +57,8 @@ export class StatusService {
     };
 
     public async postToFeed(status: StatusDto) {
-        const followers: string[] = (await this.followDao.getFollowers(status.user.alias)).map((follower) => follower.alias);
-        this.sqsDao.postToFeed(status, followers);
+        const followers: string[] = await this.followDao.getFollowers(status.user.alias);
+        await this.sqsDao.postToFeed(status, followers);
     };
 
     private async validateToken(token: string) {

@@ -130,7 +130,8 @@ export class UserService {
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
     this.validateToken(token);
-    const allFollowers = await this.followDao.getFollowers(userAlias);
+    const allFollowersAliases = await this.followDao.getFollowers(userAlias);
+    const allFollowers = await Promise.all(allFollowersAliases.map(async (alias) => await this.userDao.getUser(alias)));
     return await this.loadUserItems(allFollowers, lastItem, pageSize);
   };
 
@@ -141,23 +142,24 @@ export class UserService {
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
     this.validateToken(token);
-    const allFollowees = await this.followDao.getFollowees(userAlias);
+    const allFolloweesAliases = await this.followDao.getFollowees(userAlias);
+    const allFollowees = await Promise.all(allFolloweesAliases.map(async (alias) => await this.userDao.getUser(alias)));
     return await this.loadUserItems(allFollowees, lastItem, pageSize);
   };
 
-  private async loadUserItems(allItems: UserDto[], lastItem: UserDto | null, pageSize: number): Promise<[UserDto[], boolean]> {
+  private async loadUserItems(allItems: (UserDto | null)[], lastItem: UserDto | null, pageSize: number): Promise<[UserDto[], boolean]> {
     let result: UserDto[] = [];
     let foundLastItem = false;
     let i = 0;
     let hasMore = false;
     allItems.forEach((item) => {
-      if ((lastItem === null || foundLastItem) && i < pageSize) {
+      if ((lastItem === null || foundLastItem) && i < pageSize && item !== null) {
         result.push(item);
         i += 1;
       } else if (i >= 10) {
         hasMore = true;
       }
-      if (lastItem !== null && item.alias === lastItem.alias) {
+      if (lastItem !== null && item !== null && item.alias === lastItem.alias) {
         foundLastItem = true;
       }
     })
