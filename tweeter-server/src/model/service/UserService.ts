@@ -57,20 +57,16 @@ export class UserService {
     lastName: string,
     alias: string,
     password: string,
-    userImageBytes: Uint8Array,
+    userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
     // check for existing user with the alias
     const existingUser = await this.userDao.getUser(alias);
     if (existingUser !== null) {
       throw new Error("[Bad Request] alias already taken");
     }
 
-    const imageUrl = await this.imageDao.putImage(alias, imageStringBase64, imageFileExtension);
+    const imageUrl = await this.imageDao.putImage(alias, userImageBytes, imageFileExtension);
   
     const user = new User(firstName, lastName, alias, imageUrl).dto;
 
