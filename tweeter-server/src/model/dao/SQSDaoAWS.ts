@@ -11,7 +11,8 @@ export class SQSDaoAWS implements SQSDao {
         const messageBody = JSON.stringify({
             status: status,
         });
-        this.sendMessage(messageBody, this.statusUrl);
+        console.log("Sending message");
+        await this.sendMessage(messageBody, this.statusUrl);
     };
 
     public async postToFeed(status: StatusDto, followers: string[]) {

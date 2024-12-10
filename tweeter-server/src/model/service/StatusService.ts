@@ -52,6 +52,7 @@ export class StatusService {
         newStatus: StatusDto
     ): Promise<void> {
         const user = await this.getUserFromToken(authToken.token);
+        console.log("Posting status from service");
         await this.storyDao.createStatus(user, newStatus);
         await this.sqsDao.postStatus(newStatus);
     };

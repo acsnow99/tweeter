@@ -245,12 +245,12 @@ const postStatusTest = async () => {
       timestamp: 0,
     },
     newStatus: {
-      post: "A new post from testing",
+      post: "Another day",
       user: {
         firstName: "Daisy",
         lastName: "Duck",
         alias: "@daisy",
-        imageUrl: "google.com",
+        imageUrl: "https://cs340tweeter-images.s3.us-east-1.amazonaws.com/image/%40daisy",
       },
       timestamp: Date.now(),
       segments: []
