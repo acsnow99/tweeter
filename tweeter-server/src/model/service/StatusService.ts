@@ -68,6 +68,11 @@ export class StatusService {
         }
     };
 
+    public async postToFeed(followers: string[], status: StatusDto) {
+        const user = status.user;
+        await this.feedDao.createFeedItems(followers, user, status);
+    }
+
     private async validateToken(token: string) {
         const isValidToken = await this.sessionDao.verifyToken(token);
         if (!isValidToken) {

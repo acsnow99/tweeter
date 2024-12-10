@@ -7,6 +7,7 @@ export const handler = async (request: PostStatusRequest): Promise<PostStatusRes
         authToken,
         newStatus
     } = request;
+    console.log("Starting post");
     const response = await service.postStatus(authToken, newStatus);
     return {
         success: true,

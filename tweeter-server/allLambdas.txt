@@ -12,3 +12,5 @@ tweeterGetUser | dist/lambda/getUser/GetUser.handler
 tweeterLoadMoreFeedItems | dist/lambda/status/LoadMoreFeedItems.handler
 tweeterLoadMoreStoryItems | dist/lambda/status/LoadMoreStoryItems.handler
 tweeterPostStatus | dist/lambda/status/PostStatusLambda.handler
+tweeterPostUpdateFeedMessage | dist/lambda/sqs/PostUpdateFeedMessages.handler
+tweeterUpdateFeeds | dist/lambda/sqs/UpdateFeeds.handler

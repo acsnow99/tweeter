@@ -2,5 +2,6 @@ BUCKET='cs340acsnow99'
 LAMBDA_ROLE='arn:aws:iam::558044283445:role/340-lambda'
 EDIT_LAMBDALIST='
 tweeterPostUpdateFeedMessage | dist/lambda/sqs/PostUpdateFeedMessages.handler
+tweeterUpdateFeeds | dist/lambda/sqs/UpdateFeeds.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:9'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:558044283445:layer:tweeterLambdaLayer:10'

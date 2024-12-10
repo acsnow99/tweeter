@@ -13,6 +13,7 @@ import { handler as getIsFollowerStatusHandler } from "./lambda/follow/GetIsFoll
 import { handler as postStatusHandler } from "./lambda/status/PostStatusLambda";
 import { handler as getStoryHandler } from "./lambda/status/LoadMoreStoryItems";
 import { handler as getFeedHandler } from "./lambda/status/LoadMoreFeedItems";
+import { FeedDaoDynamo } from "./model/dao/FeedDaoDynamo";
 
 function generateRandomString(length: number): string {
     let result = '';
@@ -60,7 +61,7 @@ const registerTest = async () => {
         lastName: generateRandomString(4),
         alias: `${alias}`,
         password: 'password',
-        userImageBytes: uint8Array,
+        userImageBytes: Buffer.from(uint8Array).toString("base64"),
         imageFileExtension: 'png'
       }
     console.log(await registerHandler(registerRequest));
@@ -101,7 +102,7 @@ const populateFollowers = async () => {
         lastName: generateRandomString(4),
         alias: `${alias}`,
         password: 'password',
-        userImageBytes: new Uint8Array(),
+        userImageBytes: Buffer.from(new Uint8Array()).toString("base64"),
         imageFileExtension: 'jpg'
       }
     await registerHandler(registerRequest);
@@ -230,6 +231,7 @@ const getIsFollowerStatusTest = async () => {
 }
 
 const postStatusTest = async () => {
+  await (new FeedDaoDynamo()).deleteAllFeedItems();
   const alias = "@daisy";
   const loginRequest: LoginRequest = {
     alias: alias,

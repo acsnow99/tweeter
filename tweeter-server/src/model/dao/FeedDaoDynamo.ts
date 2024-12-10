@@ -1,5 +1,5 @@
 import { Status, StatusDto, User } from "tweeter-shared";
-import { BatchWriteCommand, DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import { BatchWriteCommand, DynamoDBDocumentClient, QueryCommand, QueryCommandInput, ScanCommand, ScanCommandInput } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { UserDto } from "tweeter-shared/src";
 import { FeedDao } from "./FeedDao";
@@ -41,6 +41,49 @@ export class FeedDaoDynamo implements FeedDao {
         const hasMore = !!getResponse.LastEvaluatedKey;
         return [feeds, hasMore];
     };
+
+    public async deleteAllFeedItems(): Promise<void> {
+        // Retrieve all items in the table to delete
+        let scanParams: ScanCommandInput = {
+            TableName: this.feedsTableName,
+            ProjectionExpression: "#followerAlias, #timestamp",
+            ExpressionAttributeNames: {
+                "#followerAlias": this.followerAliasAttr,
+                "#timestamp": this.timestampAttr, // Map 'timestamp' to an alias
+            },
+        };
+    
+        let itemsToDelete: any[] = [];
+        do {
+            const scanCommand = new ScanCommand(scanParams);
+            const scanResponse = await this.client.send(scanCommand);
+            if (scanResponse.Items) {
+                itemsToDelete.push(...scanResponse.Items);
+            }
+            scanParams.ExclusiveStartKey = scanResponse.LastEvaluatedKey;
+        } while (scanParams.ExclusiveStartKey);
+    
+        // Delete items in batches
+        const batchSize = 25; // DynamoDB supports a maximum of 25 operations per batch
+        for (let i = 0; i < itemsToDelete.length; i += batchSize) {
+            const batch = itemsToDelete.slice(i, i + batchSize).map((item) => ({
+                DeleteRequest: {
+                    Key: {
+                        [this.followerAliasAttr]: item[this.followerAliasAttr],
+                        [this.timestampAttr]: item[this.timestampAttr],
+                    },
+                },
+            }));
+    
+            const deleteParams = {
+                RequestItems: {
+                    [this.feedsTableName]: batch,
+                },
+            };
+    
+            await this.client.send(new BatchWriteCommand(deleteParams));
+        }
+    }
 
     public async createFeedItems(followerAliases: string[], user: UserDto, newStatus: StatusDto): Promise<void> {
         const items = followerAliases.map((follower) => {

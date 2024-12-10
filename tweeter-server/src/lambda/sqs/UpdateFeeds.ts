@@ -6,8 +6,9 @@ export const handler = async function (event: any) {
     for (let i = 0; i < event.Records.length; ++i) {
         const { body } = event.Records[i];
         const status: StatusDto = JSON.parse(body).status;
-        console.log("Posting status to Queue...", status.post, " Length:", event.Records.length);
-        await service.sendMessagePostToFeed(status);
+        const followers: string[] = JSON.parse(body).followers;
+        console.log("Posting status...", followers, status.post);
+        await service.postToFeed(followers, status);
     }
     return null;
 };
