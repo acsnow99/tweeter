@@ -5,13 +5,13 @@ set -e
 
 source .server
 
-# if [ -f "dist.zip" ]; then
-#   rm dist.zip
-# fi
+if [ -f "dist.zip" ]; then
+  rm dist.zip
+fi
 
-# npm run build
+npm run build
 
-# zip -r dist.zip ./dist
+zip -r dist.zip ./dist
 
 aws s3 cp dist.zip s3://$BUCKET/code/lambdalist.zip
 

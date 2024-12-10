@@ -230,10 +230,10 @@ const getIsFollowerStatusTest = async () => {
 }
 
 const postStatusTest = async () => {
-  const alias = "imagetestw5vmM";
+  const alias = "@daisy";
   const loginRequest: LoginRequest = {
     alias: alias,
-    password: "password"
+    password: "pass"
   };
   const loginResponse = await loginHandler(loginRequest);
   const token = loginResponse.token;
@@ -245,9 +245,9 @@ const postStatusTest = async () => {
     newStatus: {
       post: "A new post from testing",
       user: {
-        firstName: "Me",
-        lastName: "Son",
-        alias: "imagetestw5vmM",
+        firstName: "Daisy",
+        lastName: "Duck",
+        alias: "@daisy",
         imageUrl: "google.com",
       },
       timestamp: Date.now(),

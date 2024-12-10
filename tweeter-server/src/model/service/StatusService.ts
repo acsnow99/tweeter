@@ -1,4 +1,4 @@
-import { StatusDto } from "tweeter-shared";
+import { StatusDto, UserDto } from "tweeter-shared";
 import { AuthTokenDto } from "tweeter-shared/dist/model/dto/AuthTokenDto";
 import { DaoFactory } from "../dao/DaoFactory";
 import { FollowDao } from "../dao/FollowDao";
@@ -6,6 +6,7 @@ import { UserDao } from "../dao/UserDao";
 import { SessionDao } from "../dao/SessionDao";
 import { StoryDao } from "../dao/StoryDao";
 import { FeedDao } from "../dao/FeedDao";
+import { SQSDao } from "../dao/SQSDao";
 
 export class StatusService {
     private daoFactory: DaoFactory;
@@ -14,6 +15,7 @@ export class StatusService {
     private feedDao: FeedDao;
     private followDao: FollowDao;
     private userDao: UserDao;
+    private sqsDao: SQSDao;
 
     public constructor(daoFactory: DaoFactory) {
         this.daoFactory = daoFactory;
@@ -22,6 +24,7 @@ export class StatusService {
         this.feedDao = daoFactory.getFeedDao();
         this.followDao = daoFactory.getFollowDao();
         this.userDao = daoFactory.getUserDao();
+        this.sqsDao = daoFactory.getSqsDao();
     }
 
     public async loadMoreStoryItems(
@@ -50,9 +53,18 @@ export class StatusService {
     ): Promise<void> {
         const user = await this.getUserFromToken(authToken.token);
         await this.storyDao.createStatus(user, newStatus);
-        const followers = await this.followDao.getFollowers(user.alias);
-        if (followers.length > 0) {
-            await this.feedDao.createFeedItems(followers.map((follower) => follower.alias), user, newStatus);
+        await this.sqsDao.postStatus(newStatus);
+    };
+
+    public async sendMessagePostToFeed(status: StatusDto) {
+        const alias = status.user.alias;
+        let lastItem: { followeeAlias: string; followerAlias: string } | undefined = undefined;
+        let followers: string[] = [];
+        let hasMore = true;
+        while (hasMore) {
+            [followers, hasMore] = await this.followDao.getFollowers(alias, 25, lastItem);
+            lastItem = { followeeAlias: alias, followerAlias: followers[followers.length - 1]};
+            await this.sqsDao.postToFeed(status, followers);
         }
     };
 

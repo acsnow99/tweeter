@@ -1,0 +1,14 @@
+tweeterGetFollowers | dist/lambda/follow/GetFollowersLambda.handler
+tweeterGetFollowees | dist/lambda/follow/GetFolloweesLambda.handler
+tweeterFollow | dist/lambda/follow/Follow.handler
+tweeterUnfollow | dist/lambda/follow/Unfollow.handler
+tweeterGetFollowerCount | dist/lambda/follow/GetFollowerCount.handler
+tweeterGetFolloweeCount | dist/lambda/follow/GetFolloweeCount.handler
+tweeterGetIsFollowerStatus | dist/lambda/follow/GetIsFollowerStatus.handler
+tweeterLogin | dist/lambda/auth/Login.handler
+tweeterLogout | dist/lambda/auth/Logout.handler
+tweeterRegister | dist/lambda/auth/Register.handler
+tweeterGetUser | dist/lambda/getUser/GetUser.handler
+tweeterLoadMoreFeedItems | dist/lambda/status/LoadMoreFeedItems.handler
+tweeterLoadMoreStoryItems | dist/lambda/status/LoadMoreStoryItems.handler
+tweeterPostStatus | dist/lambda/status/PostStatusLambda.handler
