@@ -4,8 +4,8 @@ import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export class SQSDaoAWS implements SQSDao {
     private client = new SQSClient();
-    private statusUrl = "https://sqs.us-east-1.amazonaws.com/558044283445/tweeter-post-status-queue";
-    private feedUrl = "https://sqs.us-east-1.amazonaws.com/558044283445/tweeter-update-feed-queue";
+    private statusUrl = "https://sqs.us-east-1.amazonaws.com/558044283445/tweeter-post-status-queue-1";
+    private feedUrl = "https://sqs.us-east-1.amazonaws.com/558044283445/tweeter-update-feed-queue-1";
 
     public async postStatus(status: StatusDto) {
         const messageBody = JSON.stringify({

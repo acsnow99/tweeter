@@ -163,24 +163,20 @@ const unfollowTest = async () => {
 }
 
 const getFollowersTest = async () => {
-  const alias = "bI9jCRnZVP";
+  const alias = "@daisy";
   const loginRequest: LoginRequest = {
     alias: alias,
-    password: "password"
+    password: "pass"
   };
   const loginResponse = await loginHandler(loginRequest);
   const token = loginResponse.token;
   const getFollowersRequest: PagedUserItemRequest = {
     token: token,
-    userAlias: "me",
+    userAlias: "@daisy",
     pageSize: 10,
-    lastItem: {
-      firstName: "what",
-      lastName: "no",
-      alias: "kT2Jzkdioq",
-      imageUrl: "google.com"
-    }
+    lastItem: null
   }
+  console.log("Starting request...");
   console.log(await getFollowersHandler(getFollowersRequest));
 }
 
@@ -323,4 +319,4 @@ const getFeedTest = async () => {
   console.log(await getFeedHandler(request));
 }
 
-postStatusTest();
+getFollowersTest();

@@ -126,9 +126,13 @@ export class UserService {
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
     this.validateToken(token);
-    const [allFollowersAliases, hasMore] = await this.followDao.getFollowers(userAlias);
+    const [allFollowersAliases, hasMore] = await this.followDao.getFollowers(userAlias, pageSize, lastItem ? {followeeAlias: userAlias, followerAlias: lastItem.alias} : undefined);
     const allFollowers = await Promise.all(allFollowersAliases.map(async (alias) => await this.userDao.getUser(alias)));
-    return await this.loadUserItems(allFollowers, lastItem, pageSize);
+    const returnList: UserDto[] = [];
+    allFollowers.forEach((follower) => { if (follower !== null) {
+      returnList.push(follower);
+    }});
+    return [returnList, hasMore];
   };
 
   public async loadMoreFollowees(
